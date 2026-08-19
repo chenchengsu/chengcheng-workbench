@@ -3129,6 +3129,12 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .bead-log-line b { font-size: 13px; font-weight: 600; }
 .bead-log-time { font-size: 11px; color: var(--text-tertiary); flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .bead-log-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; word-break: break-all; }
+/* 拼豆导出库存预览（与库存列表同风格） */
+.bead-exp-preview { margin-top: 4px; padding: 12px 14px; }
+.bead-exp-preview-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.bead-exp-preview-title { font-size: 14px; font-weight: 600; }
+.bead-exp-count { font-size: 12px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; background: var(--glass-border-light); padding: 2px 10px; border-radius: 999px; }
+.bead-exp-list { display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
 @keyframes launchZoom {
   0%   { transform: scale(0.55); opacity: 0; }
   22%  { opacity: 1; }
