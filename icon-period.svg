@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff1f2"/>
+      <stop offset="1" stop-color="#ffe4e6"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#faf5ff"/>
+  <rect x="18" y="18" width="64" height="64" rx="18" fill="url(#bg4)" stroke="#fda4af" stroke-width="2"/>
+  <!-- 樱花 -->
+  <g transform="translate(50,50)">
+    <!-- 花瓣 -->
+    <ellipse cx="0" cy="-12" rx="7" ry="11" fill="#fecdd3" transform="rotate(0)"/>
+    <ellipse cx="0" cy="-12" rx="7" ry="11" fill="#fda4af" transform="rotate(72)"/>
+    <ellipse cx="0" cy="-12" rx="7" ry="11" fill="#fb7185" transform="rotate(144)"/>
+    <ellipse cx="0" cy="-12" rx="7" ry="11" fill="#f43f5e" transform="rotate(216)"/>
+    <ellipse cx="0" cy="-12" rx="7" ry="11" fill="#ec4899" transform="rotate(288)"/>
+    <!-- 花蕊 -->
+    <circle cx="0" cy="0" r="5" fill="#fbbf24"/>
+    <circle cx="-1.5" cy="-1.5" r="1" fill="#f59e0b"/>
+    <circle cx="1.8" cy="-0.5" r="1" fill="#f59e0b"/>
+    <circle cx="0" cy="2" r="1" fill="#f59e0b"/>
+    <!-- 花茎 -->
+    <line x1="0" y1="10" x2="0" y2="20" stroke="#86efac" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>
