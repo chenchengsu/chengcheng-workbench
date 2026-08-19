@@ -1275,6 +1275,7 @@ const AccountView = {
       <div class="page-header-actions" style="margin-left:auto">
         <button class="btn btn-glass btn-sm btn-clear-data" onclick="AccountView.clearAllData()" title="清除数据">🗑</button>
         <button class="btn btn-glass btn-sm" style="color:var(--info)" onclick="AccountView.switchViewMode('reimburse')">💰 报销</button>
+        <button class="btn btn-glass btn-sm" style="color:var(--info)" onclick="AccountView.exportAllData()" title="导出全部记账数据（CSV）">📤 导出</button>
         <button class="btn btn-primary btn-sm" onclick="AccountView.openAdd()">+ 记一笔</button>
       </div>
     </div>`;
@@ -1571,6 +1572,44 @@ const AccountView = {
       this.render();
       if (typeof HealthView !== 'undefined') HealthView.renderWeight();
     });
+  },
+  exportAllData() {
+    const entries = Store.getAccounts().slice().sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    if (entries.length === 0) { Toast.show('暂无记账数据'); return; }
+    const TYPE_LABEL = { income: '收入', expense: '支出', transfer: '转账', refund: '退款', reimburse: '报销' };
+    const header = ['日期', '类型', '账户', '分类', '金额', '备注', '可报销', '报销状态', '创建时间'];
+    const lines = [header.map(csvCell).join(',')];
+    entries.forEach(e => {
+      const type = e.type === 'reimburse' ? 'reimburse' : (e.type || '');
+      let reimStatus = '否';
+      if (e.reimbursable) {
+        if (e.reimbursementClosed) reimStatus = '已报销完成';
+        else if ((e.reimbursements || []).length) reimStatus = '报销中';
+        else reimStatus = '待报销';
+      }
+      const account = e.account || (e.transferDir === 'out' ? '转出账户' : (e.transferDir === 'in' ? '转入账户' : ''));
+      lines.push([
+        e.date || '',
+        TYPE_LABEL[type] || type,
+        account,
+        e.category || '',
+        e.amount != null ? e.amount : '',
+        e.note || '',
+        e.reimbursable ? '是' : '否',
+        reimStatus,
+        e.createdAt || ''
+      ].map(csvCell).join(','));
+    });
+    const csv = '﻿' + lines.join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const fn = `记账数据_全部_${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}.csv`;
+    a.href = url; a.download = fn; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    Toast.show('已导出 ' + entries.length + ' 条记账');
   },
   openAdd() { Modal.open('记一笔', this._form()); },
   openEdit(id) { const e = Store.getAccounts().find(x=>x.id===id); if (!e) return; Modal.open('编辑记录', this._form(e)); },
@@ -3418,13 +3457,14 @@ const BeadView = {
   openExport() {
     const fams = BEAD_FAMILIES;
     Modal.open('导出库存', `
-      <div class="form-group"><label class="form-label">导出范围</label>
-        <select class="form-input" id="beadExpRange">
-          <option value="all">全部色号（含库存为 0）</option>
-          <option value="instock">仅导出有库存的色号</option>
-          <option value="low">仅导出低库存 / 缺货色号</option>
-          <option value="family">按色系分组导出</option>
-        </select>
+      <div class="form-group">
+        <label class="form-label">导出范围</label>
+        <div class="filter-chips" id="beadExpRange">
+          <div class="filter-chip active" data-range="all">全部色号</div>
+          <div class="filter-chip" data-range="instock">仅含库存</div>
+          <div class="filter-chip" data-range="low">低库存 / 缺货</div>
+          <div class="filter-chip" data-range="family">按色系</div>
+        </div>
       </div>
       <div class="form-group" id="beadExpFamWrap" style="display:none">
         <label class="form-label">选择色系</label>
@@ -3445,11 +3485,18 @@ const BeadView = {
       </div>
     `);
     const refresh = () => {
-      const range = $('#beadExpRange').value;
+      const active = $('#beadExpRange .filter-chip.active');
+      const range = active ? active.dataset.range : 'all';
       $('#beadExpFamWrap').style.display = range === 'family' ? 'block' : 'none';
       this._renderExpPreview(range, range === 'family' ? $('#beadExpFam').value : null);
     };
-    $('#beadExpRange').addEventListener('change', refresh);
+    $$('#beadExpRange .filter-chip').forEach(ch => {
+      ch.addEventListener('click', () => {
+        $$('#beadExpRange .filter-chip').forEach(c => c.classList.remove('active'));
+        ch.classList.add('active');
+        refresh();
+      });
+    });
     $('#beadExpFam').addEventListener('change', refresh);
     refresh();
   },
@@ -3483,7 +3530,8 @@ const BeadView = {
     }).join('');
   },
   _doExport() {
-    const range = $('#beadExpRange').value;
+    const active = $('#beadExpRange .filter-chip.active');
+    const range = active ? active.dataset.range : 'all';
     const threshold = Store.getBeadThreshold();
     let beads = getAllBeads();
     const stock = Store.getBeadStock();
