@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bg6" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="1" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="roof-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ef4444"/>
+      <stop offset="1" stop-color="#b91c1c"/>
+    </linearGradient>
+    <linearGradient id="body-g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4a574"/>
+      <stop offset="1" stop-color="#a67c52"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#faf5ff"/>
+  <rect x="18" y="18" width="64" height="64" rx="18" fill="url(#bg6)" stroke="#fcd34d" stroke-width="2"/>
+  <!-- 粮仓 -->
+  <g transform="translate(50,50)">
+    <!-- 屋顶 -->
+    <path d="M-20 -2 L0 -18 L20 -2 Z" fill="url(#roof-g)"/>
+    <!-- 仓体 -->
+    <rect x="-17" y="-1" width="34" height="24" rx="3" fill="url(#body-g)"/>
+    <!-- 门 -->
+    <rect x="-5" y="7" width="10" height="16" rx="2" fill="#78350f"/>
+    <circle cx="3" cy="16" r="1.5" fill="#fcd34d"/>
+    <!-- 门横条 -->
+    <line x1="-3" y1="12" x2="5" y2="12" stroke="#92400e" stroke-width="1"/>
+    <line x1="-3" y1="18" x2="5" y2="18" stroke="#92400e" stroke-width="1"/>
+  </g>
+</svg>
