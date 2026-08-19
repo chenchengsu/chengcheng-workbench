@@ -436,6 +436,10 @@ const DatePicker = {
     // 保存当前模态框内容，选完日期后恢复
     this._prevHeader = $('#modalHeader').innerHTML;
     this._prevBody = $('#modalBody').innerHTML;
+    // 保存表单中已填写的实时值（如金额），避免选日期后被静态 innerHTML 覆盖清空
+    this._prevValues = {};
+    const mb = $('#modalBody');
+    if (mb) mb.querySelectorAll('input, select, textarea').forEach(el => { if (el.id) this._prevValues[el.id] = el.value; });
     const d = currentValue ? parseDate(currentValue) : new Date();
     CalNav.init('datepicker', d.getFullYear(), d.getMonth(), currentValue || todayStr());
     this._render();
@@ -451,9 +455,7 @@ const DatePicker = {
     if (container) Calendar.render(container, y, m, { selectedDate: sel });
   },
   select(date) {
-    // 恢复原始表单内容
-    $('#modalHeader').innerHTML = this._prevHeader;
-    $('#modalBody').innerHTML = this._prevBody;
+    this._restoreForm();
     // 更新日期字段
     const input = $(`#${this._fieldId}`);
     if (input) input.value = date;
@@ -461,13 +463,49 @@ const DatePicker = {
     if (display) { display.textContent = date; display.classList.remove('placeholder'); }
   },
   clear() {
-    // 恢复原始表单内容
-    $('#modalHeader').innerHTML = this._prevHeader;
-    $('#modalBody').innerHTML = this._prevBody;
+    this._restoreForm();
     const input = $(`#${this._fieldId}`);
     if (input) input.value = '';
     const display = $(`#${this._fieldId}_display`);
     if (display) { display.textContent = '留空表示进行中'; display.classList.add('placeholder'); }
+  },
+  _restoreForm() {
+    // 恢复原始表单 HTML
+    $('#modalHeader').innerHTML = this._prevHeader;
+    $('#modalBody').innerHTML = this._prevBody;
+    // 回填选日期前已填写的实时值（金额、备注、隐藏字段等）
+    if (this._prevValues) {
+      Object.keys(this._prevValues).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = this._prevValues[id];
+      });
+    }
+    // 重新同步 chip / 按钮的选中态（基于隐藏字段的值）
+    this._syncFormChips();
+  },
+  _syncFormChips() {
+    const body = $('#modalBody');
+    if (!body) return;
+    const t = body.querySelector('#ac-type');
+    if (t) body.querySelectorAll('.type-btn[data-type]').forEach(b => b.classList.toggle('active', b.dataset.type === t.value));
+    const sync = (fieldId, attr) => {
+      const f = body.querySelector('#' + fieldId);
+      if (!f) return;
+      body.querySelectorAll('[data-' + attr + ']').forEach(c => c.classList.toggle('active', c.getAttribute('data-' + attr) === f.value));
+    };
+    sync('ac-account', 'account');
+    sync('ac-tf-from', 'account');
+    sync('ac-tf-to', 'account');
+    sync('ac-category', 'cat');
+    const r = body.querySelector('#ac-reimbursable');
+    const tag = body.querySelector('#ac-reimbursable-tag');
+    if (r && tag) { const v = r.value === 'true'; tag.classList.toggle('active', v); tag.classList.toggle('tag-reimburse', v); }
+    const trG = body.querySelector('#ac-transfer-group');
+    if (trG && t) trG.style.display = (t.value === 'transfer') ? '' : 'none';
+    const acR = body.querySelector('#ac-account-row'); if (acR && t) acR.style.display = (t.value === 'transfer') ? 'none' : '';
+    const catR = body.querySelector('#ac-category-row'); if (catR && t) catR.style.display = (t.value === 'transfer') ? 'none' : '';
+    const rr = body.querySelector('#ac-reimbursable-row');
+    if (rr && t) { const sub = body.querySelector('#ac-expense-sub'); const s = sub ? sub.value : 'normal'; rr.style.display = (t.value === 'expense' && s !== 'refund') ? '' : 'none'; }
   }
 };
 
@@ -729,10 +767,10 @@ const HealthView = {
     html += `<div class="glass glass-pink weight-hero">
       <div class="weight-hero-left">
         <div class="weight-hero-label">当前体重</div>
-        <div class="weight-hero-value"><span class="weight-hero-num">${latest?latest.weight:'--'}</span><span class="weight-hero-unit">kg</span></div>`;
+        <div class="weight-hero-value"><span class="weight-hero-num">${latest ? Number(latest.weight).toFixed(2) : '--'}</span><span class="weight-hero-unit">kg</span></div>`;
     if (latest && prev) {
-      const d = (latest.weight - prev.weight).toFixed(1);
-      html += `<div class="weight-change ${d<0?'down':'up'}">${d>0?'↑':'↓'} ${Math.abs(d)} kg ${d<0?'🎉 减重成功':'继续努力'}</div>`;
+      const d = (latest.weight - prev.weight);
+      html += `<div class="weight-change ${d<0?'down':'up'}">${d>0?'↑':'↓'} ${Math.abs(d).toFixed(2)} kg ${d<0?'🎉 减重成功':'继续努力'}</div>`;
     } else {
       html += `<div class="text-xs text-tertiary">${latest?'首次记录':'暂无记录'}</div>`;
     }
@@ -751,7 +789,7 @@ const HealthView = {
       </div>
       <div class="glass weight-mini-stat">
         <div class="weight-mini-label">平均体重</div>
-        <div class="weight-mini-value">${ws.length?(ws.reduce((s,w)=>s+w.weight,0)/ws.length).toFixed(1):'--'}<span class="unit"> kg</span></div>
+        <div class="weight-mini-value">${ws.length?(ws.reduce((s,w)=>s+w.weight,0)/ws.length).toFixed(2):'--'}<span class="unit"> kg</span></div>
       </div>
     </div>`;
 
@@ -773,7 +811,7 @@ const HealthView = {
             <div class="history-date">${w.date} ${getWeekday(w.date)}</div>
           </div>
           <div class="flex items-center gap-10" style="gap:10px">
-            <div class="history-weight">${w.weight} <span style="font-size:12px;color:var(--text-secondary)">kg</span></div>
+            <div class="history-weight">${Number(w.weight).toFixed(2)} <span style="font-size:12px;color:var(--text-secondary)">kg</span></div>
             <div class="task-actions">
               <button class="btn-icon" onclick="HealthView.openWeightEdit('${w.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
               <button class="btn-icon" onclick="HealthView.delWeight('${w.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
@@ -803,7 +841,7 @@ const HealthView = {
           pointBackgroundColor: '#ff3d7f', pointRadius: 3, pointHoverRadius: 6
         }]
       },
-      options: { ...opts, plugins: { ...opts.plugins, legend: { display: false } } }
+      options: { ...opts, plugins: { ...opts.plugins, legend: { display: false } }, scales: { ...opts.scales, y: { ...opts.scales.y, ticks: { ...opts.scales.y.ticks, callback: (v) => Number(v).toFixed(2) } } } }
     });
   },
   openWeightAdd() { Modal.open('记录体重', this._weightForm()); },
@@ -812,7 +850,7 @@ const HealthView = {
     return `
       <div class="form-row">
         <div class="form-group"><label class="form-label">日期</label>${dateFieldHTML('w-date', w?w.date:todayStr())}</div>
-        <div class="form-group"><label class="form-label">体重 (kg)</label><input class="form-input" type="number" step="0.1" id="w-weight" placeholder="如 65.5" value="${w?w.weight:''}" autofocus></div>
+        <div class="form-group"><label class="form-label">体重 (kg)</label><input class="form-input" type="number" step="0.01" id="w-weight" placeholder="如 65.50" value="${w?w.weight:''}" autofocus></div>
       </div>
       <div class="form-actions"><button class="btn btn-glass" onclick="Modal.close()">取消</button><button class="btn btn-primary" onclick="HealthView.saveWeight('${w?w.id:''}')">保存</button></div>
     `;
@@ -977,7 +1015,7 @@ const AccountView = {
     this.render();
   },
   _fmtAmt(n, prefix = '') {
-    return `${prefix}¥${fmtMoney(n)}`;
+    return `${prefix}${fmtMoney(n)}`;
   },
   _balanceOf(accAll) {
     const inc = accAll.filter(e => e.type === 'income').reduce((s,e) => s + parseFloat(e.amount), 0);
@@ -990,7 +1028,7 @@ const AccountView = {
   _balanceText(bal, hide) {
     if (hide) return '∗∗∗∗';
     if (bal < 0) return '<span class="bal-error">【该笔记账有误】</span>';
-    return `${bal>=0?'':'-'}¥${fmtMoney(Math.abs(bal))}`;
+    return `${bal>=0?'':'-'}${fmtMoney(Math.abs(bal))}`;
   },
   _txAmtHTML(e) {
     let sign, cls;
@@ -1106,7 +1144,7 @@ const AccountView = {
         const color = CONFIG.categoryColors[e.category] || '#95a5a6';
         const refunded = this._refundedTotal(e);
         const netTag = (e.type === 'expense' && refunded > 0)
-          ? `<span class="tx-refund-tag">已退 ¥${fmtMoney(refunded)}</span>` : '';
+          ? `<span class="tx-refund-tag">已退 ${fmtMoney(refunded)}</span>` : '';
         body += `<div class="transaction-item" onclick="AccountView.openExpenseDetail('${e.id}')">
           <div class="transaction-icon" style="background:${color}22">${icon}</div>
           <div class="transaction-info">
@@ -1137,15 +1175,15 @@ const AccountView = {
         <div class="correction-info">
           <div class="correction-info-item">
             <span class="correction-info-label">收入</span>
-            <span class="correction-info-value text-success tabular">¥${fmtMoney(inc)}</span>
+            <span class="correction-info-value text-success tabular">${fmtMoney(inc)}</span>
           </div>
           <div class="correction-info-item">
             <span class="correction-info-label">支出</span>
-            <span class="correction-info-value text-danger tabular">¥${fmtMoney(exp)}</span>
+            <span class="correction-info-value text-danger tabular">${fmtMoney(exp)}</span>
           </div>
           <div class="correction-info-item highlight">
             <span class="correction-info-label">当前结余</span>
-            <span class="correction-info-value tabular" style="color:${calculated>=0?'var(--success)':'var(--danger)'}">${calculated>=0?'':'-'}¥${fmtMoney(Math.abs(calculated))}</span>
+            <span class="correction-info-value tabular" style="color:${calculated>=0?'var(--success)':'var(--danger)'}">${calculated>=0?'':'-'}${fmtMoney(Math.abs(calculated))}</span>
           </div>
         </div>
         <div class="correction-divider">收入 − 支出 = 结余</div>
@@ -1180,16 +1218,16 @@ const AccountView = {
         if (isNaN(actual)) { preview.style.display = 'none'; return; }
         const diff = actual - calculated;
         preview.style.display = 'block';
-        $('#cor-diff').textContent = `${diff>=0?'+':'-'}¥${fmtMoney(Math.abs(diff))}`;
+        $('#cor-diff').textContent = `${diff>=0?'+':'-'}${fmtMoney(Math.abs(diff))}`;
         $('#cor-diff').style.color = diff >= 0 ? 'var(--success)' : 'var(--danger)';
         if (Math.abs(diff) < 0.01) {
           $('#cor-action').textContent = '无需纠正';
           $('#cor-action').style.color = 'var(--text-secondary)';
         } else if (diff > 0) {
-          $('#cor-action').textContent = `+¥${fmtMoney(diff)}（收入 · 其他）`;
+          $('#cor-action').textContent = `+${fmtMoney(diff)}（收入 · 其他）`;
           $('#cor-action').style.color = 'var(--success)';
         } else {
-          $('#cor-action').textContent = `-¥${fmtMoney(Math.abs(diff))}（支出 · 其他）`;
+          $('#cor-action').textContent = `-${fmtMoney(Math.abs(diff))}（支出 · 其他）`;
           $('#cor-action').style.color = 'var(--danger)';
         }
       });
@@ -1210,7 +1248,7 @@ const AccountView = {
       note: '余额纠正'
     };
     Store.addAccount(entry);
-    Toast.show(`已纠正 ${diff>0?'+':''}¥${fmtMoney(Math.abs(diff))}`);
+    Toast.show(`已纠正 ${diff>0?'+':''}${fmtMoney(Math.abs(diff))}`);
     Modal.close();
     this.openAccountDetail(accName);
     this.render();
@@ -1267,7 +1305,7 @@ const AccountView = {
       </div>
       <div class="account-balance-total">
         <span class="account-balance-label">总资产</span>
-        <span class="account-balance-value tabular" style="color:${totalBalance>=0?'var(--success)':'var(--danger)'}">${hidden?'∗∗∗∗':`${totalBalance>=0?'':'-'}¥${fmtMoney(Math.abs(totalBalance))}`}</span>
+        <span class="account-balance-value tabular" style="color:${totalBalance>=0?'var(--success)':'var(--danger)'}">${hidden?'∗∗∗∗':`${totalBalance>=0?'':'-'}${fmtMoney(Math.abs(totalBalance))}`}</span>
       </div>
       <div class="account-balance-list">
         ${accountBalances.map((a, idx) => this.reorderMode ? `
@@ -1347,41 +1385,13 @@ const AccountView = {
       <div id="accDayContent"></div>
     </div>`;
 
-    // Year chart
-    html += `<div class="glass chart-card">
-      <div class="section-title">📊 ${this.curYear}年月度收支</div>
-      <div class="chart-wrapper" style="height:180px"><canvas id="yearChart"></canvas></div>
-    </div>`;
-
-    // Year summary
-    const yearAll = all.filter(e => yearKey(e.date) === String(this.curYear));
-    const yIncome = yearAll.filter(e=>e.type==='income').reduce((s,e)=>s+parseFloat(e.amount),0);
-    const yExpense = yearAll.filter(e=>e.type==='expense').reduce((s,e)=>s+parseFloat(e.amount),0);
-    const prevYearAll = all.filter(e => yearKey(e.date) === String(this.curYear-1));
-    const pYIncome = prevYearAll.filter(e=>e.type==='income').reduce((s,e)=>s+parseFloat(e.amount),0);
-    const pYExpense = prevYearAll.filter(e=>e.type==='expense').reduce((s,e)=>s+parseFloat(e.amount),0);
-
-    html += `<div class="glass chart-card">
-      <div class="section-title">📋 年度对比</div>
-      <div class="flex justify-between" style="margin-bottom:10px"><span class="text-sm text-secondary">${this.curYear}年结余</span><span class="font-bold tabular" style="color:${yIncome-yExpense>=0?'var(--success)':'var(--danger)'}">${this._fmtAmt(yIncome-yExpense)}</span></div>
-      <div class="flex justify-between" style="margin-bottom:10px"><span class="text-sm text-secondary">收入 / 支出</span><span class="text-sm tabular"><span class="text-success">${this._fmtAmt(yIncome)}</span> / <span class="text-danger">${this._fmtAmt(yExpense)}</span></span></div>`;
-    if (pYIncome > 0 || pYExpense > 0) {
-      const ic = yIncome - pYIncome, ec = yExpense - pYExpense;
-      html += `<div style="padding-top:10px;border-top:1px solid var(--glass-border-light)">
-        <div class="flex justify-between" style="margin-bottom:6px"><span class="text-sm text-secondary">较${this.curYear-1}年收入</span><span class="text-sm font-medium ${ic>=0?'text-success':'text-danger'} tabular">${ic>=0?'+':''}¥${fmtMoney(ic)}</span></div>
-        <div class="flex justify-between"><span class="text-sm text-secondary">较${this.curYear-1}年支出</span><span class="text-sm font-medium ${ec<=0?'text-success':'text-danger'} tabular">${ec>=0?'+':''}¥${fmtMoney(ec)}</span></div>
-      </div>`;
-    } else {
-      html += '<div class="text-xs text-tertiary text-center" style="padding-top:8px">暂无去年同期数据</div>';
-    }
-    html += '</div>';
+    // （已移除：月度收支图表与年度对比）
 
     // Filter bar + Transactions (wrapped for partial re-render)
     html += `<div id="filterTxSection">${this._filterTxHTML()}</div>`;
 
     view.innerHTML = html;
     this._scrollMonth();
-    this.renderCharts(all);
     // 收支日历
     if (this.calYear === undefined) { const nd = new Date(); this.calYear = nd.getFullYear(); this.calMonth = nd.getMonth(); }
     if (!this.calSel) this.calSel = todayStr();
@@ -1443,7 +1453,7 @@ const AccountView = {
         const color = CONFIG.categoryColors[e.category] || '#95a5a6';
         const refunded = this._refundedTotal(e);
         const netTag = (e.type === 'expense' && refunded > 0)
-          ? `<span class="tx-refund-tag">已退 ¥${fmtMoney(refunded)}</span>` : '';
+          ? `<span class="tx-refund-tag">已退 ${fmtMoney(refunded)}</span>` : '';
         const reimTag = (e.type === 'expense' && e.reimbursable) ? this._reimStatusTag(e) : '';
         const flowTag = e.refundId ? `<span class="tx-flow-tag refund">退款到账</span>`
           : e.reimbursementId ? `<span class="tx-flow-tag reimburse">报销到账</span>` : '';
@@ -1480,27 +1490,7 @@ const AccountView = {
     }
   },
   renderCharts(all) {
-    // Year chart
-    ChartMgr.destroy('yearChart');
-    const yc = $('#yearChart'); if (yc) {
-      const labels=[],incs=[],exps=[];
-      for (let m=0;m<12;m++) {
-        const mk = `${this.curYear}-${String(m+1).padStart(2,'0')}`;
-        labels.push(`${m+1}月`);
-        const es = all.filter(e => monthKey(e.date) === mk);
-        incs.push(es.filter(e=>e.type==='income').reduce((s,e)=>s+parseFloat(e.amount),0));
-        exps.push(es.filter(e=>e.type==='expense').reduce((s,e)=>s+parseFloat(e.amount),0));
-      }
-      const opts = ChartMgr.darkOpts();
-      ChartMgr.charts.yearChart = new Chart(yc, {
-        type: 'bar',
-        data: { labels, datasets: [
-          { label:'收入', data:incs, backgroundColor:'#4ade80', borderRadius:5, barPercentage:0.5 },
-          { label:'支出', data:exps, backgroundColor:'#ff3d7f', borderRadius:5, barPercentage:0.5 }
-        ]},
-        options: opts
-      });
-    }
+    // 已移除年度图表（月度收支 / 年度对比）
   },
   renderCal() {
     const all = Store.getAccounts();
@@ -1888,8 +1878,8 @@ const AccountView = {
     if (e.reimbursementClosed) return `<span class="reim-tag closed" title="已完成报销，点击可重新开启" style="cursor:pointer" onclick="AccountView.reopenReim('${e.id}')">已完成报销 · 点击重开</span>`;
     const remain = this._pendingRemain(e);
     const done = (e.reimbursements || []).reduce((s,r) => s + parseFloat(r.amount), 0);
-    if (remain > 0.005) return `<span class="reim-tag pending">待报销 ¥${fmtMoney(remain)}</span>`;
-    if (done > 0.005) return `<span class="reim-tag done">已报销 ¥${fmtMoney(done)}</span>`;
+    if (remain > 0.005) return `<span class="reim-tag pending">待报销 ${fmtMoney(remain)}</span>`;
+    if (done > 0.005) return `<span class="reim-tag done">已报销 ${fmtMoney(done)}</span>`;
     return '';
   },
   switchViewMode(m) {
@@ -1963,13 +1953,13 @@ const AccountView = {
         <div class="reim-form-source">
           <span class="cat-icon-sm">${CONFIG.categoryIcons[e.category]||'📌'}</span>
           <span>${e.category}</span>
-          <span class="reim-form-amt">¥-${fmtMoney(parseFloat(e.amount))}</span>
+          <span class="reim-form-amt">-${fmtMoney(parseFloat(e.amount))}</span>
         </div>
         ${this._reimStatusTag(e)}
         <div class="reim-form-meta">${e.account}</div>
       </div>
       ${remain < 0.005 ? '<div class="reim-form-note">该账单已全额报销，可继续记录额外或分期报销。</div>' : ''}
-      <div class="form-group"><label class="form-label">报销金额</label><input class="form-input" type="number" step="0.01" id="reim-amount" placeholder="请输入报销金额（不超过 ¥${fmtMoney(parseFloat(e.amount))}）"></div>
+      <div class="form-group"><label class="form-label">报销金额</label><input class="form-input" type="number" step="0.01" id="reim-amount" placeholder="请输入报销金额（不超过 ${fmtMoney(parseFloat(e.amount))}）"></div>
       <div class="form-group"><label class="form-label">报销时间</label>${dateFieldHTML('reim-date', todayStr())}</div>
       <div class="form-group"><label class="form-label">报销账户</label>
         ${this._accountFieldHTML('reim-account', defaultAcc)}
@@ -1987,7 +1977,7 @@ const AccountView = {
     if (!e) return;
     const amt = parseFloat($('#reim-amount').value);
     if (!amt || amt <= 0) { Toast.show('请输入有效金额', 'error'); return; }
-    if (amt > parseFloat(e.amount) + 0.005) { Toast.show('报销金额不能超过账单金额 ¥' + fmtMoney(parseFloat(e.amount)), 'error'); return; }
+    if (amt > parseFloat(e.amount) + 0.005) { Toast.show('报销金额不能超过账单金额 ' + fmtMoney(parseFloat(e.amount)), 'error'); return; }
     const reim = { id: uid(), amount: amt.toFixed(2), toAccount: $('#reim-account').value, date: $('#reim-date').value, note: $('#reim-note').value.trim() };
     if (!e.reimbursements) e.reimbursements = [];
     e.reimbursements.push(reim);
@@ -2051,9 +2041,9 @@ const AccountView = {
         <div class="reim-form-source">
           <span class="cat-icon-sm">${CONFIG.categoryIcons[e.category]||'📌'}</span>
           <span>${e.category}</span>
-          <span class="reim-form-amt">账单 ¥${fmtMoney(parseFloat(e.amount))}</span>
+          <span class="reim-form-amt">账单 ${fmtMoney(parseFloat(e.amount))}</span>
         </div>
-        <div class="reim-form-meta">原账户 ${e.account} · 可报销上限 ¥${fmtMoney(maxAmt)}</div>
+        <div class="reim-form-meta">原账户 ${e.account} · 可报销上限 ${fmtMoney(maxAmt)}</div>
       </div>
       <div class="form-group"><label class="form-label">报销金额</label>
         <input class="form-input" type="number" step="0.01" id="reim-e-amount" value="${parseFloat(r.amount).toFixed(2)}">
@@ -2076,7 +2066,7 @@ const AccountView = {
     if (!e || !r) return;
     const amt = parseFloat($('#reim-e-amount').value);
     if (!amt || amt <= 0) { Toast.show('请输入有效金额', 'error'); return; }
-    if (amt > parseFloat(maxAmt) + 0.005) { Toast.show(`报销金额不能超过 ¥${fmtMoney(parseFloat(maxAmt))}`, 'error'); return; }
+    if (amt > parseFloat(maxAmt) + 0.005) { Toast.show(`报销金额不能超过 ${fmtMoney(parseFloat(maxAmt))}`, 'error'); return; }
     const date = $('#reim-e-date').value || r.date;
     const toAccount = $('#reim-e-account').value;
     const note = $('#reim-e-note').value.trim();
@@ -2147,10 +2137,10 @@ const AccountView = {
         <span class="cat-icon-lg">${icon}</span>
         <div class="detail-head-info">
           <div class="detail-cat">${e.category} ${e.note?'📝':''}</div>
-          <div class="detail-amt">¥${fmtMoney(parseFloat(e.amount))} ${refundedAmt > 0 ? `<span style="color:var(--success);font-size:0.85em">¥${netAmt >= 0 ? '-' + fmtMoney(netAmt) : fmtMoney(netAmt)}</span>` : ''}</div>
+          <div class="detail-amt">${fmtMoney(parseFloat(e.amount))} ${refundedAmt > 0 ? `<span style="color:var(--success);font-size:0.85em">${netAmt >= 0 ? '-' + fmtMoney(netAmt) : fmtMoney(netAmt)}</span>` : ''}</div>
           <div class="detail-account">${e.account}</div>
         </div>
-        ${refundedAmt > 0 ? `<span class="reim-tag done" style="background:linear-gradient(135deg,#10b981,#059669)">已退款 ¥${fmtMoney(refundedAmt)}</span>` : ''}
+        ${refundedAmt > 0 ? `<span class="reim-tag done" style="background:linear-gradient(135deg,#10b981,#059669)">已退款 ${fmtMoney(refundedAmt)}</span>` : ''}
         ${e.reimbursable ? this._reimStatusTag(e) : ''}
       </div>
       <div class="detail-fields">
@@ -2168,7 +2158,7 @@ const AccountView = {
       e.refunds.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(r => {
         html += `<div class="reim-hist-item">
           <span>${r.date.slice(0,10)} ${getWeekday(r.date.slice(0,10))}</span>
-          <span class="reim-hist-amt" style="color:var(--success)">¥${fmtMoney(parseFloat(r.amount))}</span>
+          <span class="reim-hist-amt" style="color:var(--success)">${fmtMoney(parseFloat(r.amount))}</span>
           <span class="reim-hist-acc">→${r.toAccount}</span>
           <span class="icon-btn" title="编辑" onclick="AccountView.openRefundEdit('${e.id}','${r.id}')">✏️</span>
           <span class="icon-btn" title="删除" onclick="AccountView.delRefund('${e.id}','${r.id}')">🗑</span>
@@ -2184,7 +2174,7 @@ const AccountView = {
       e.reimbursements.slice().sort((a,b)=>b.date.localeCompare(a.date)).forEach(r => {
         html += `<div class="reim-hist-item">
           <span>${r.date.slice(0,10)} ${getWeekday(r.date.slice(0,10))}</span>
-          <span class="reim-hist-amt">¥${fmtMoney(parseFloat(r.amount))}</span>
+          <span class="reim-hist-amt">${fmtMoney(parseFloat(r.amount))}</span>
           <span class="reim-hist-acc">→${r.toAccount}</span>
           <span class="icon-btn" title="编辑" onclick="AccountView.openReimEdit('${e.id}','${r.id}',1)">✏️</span>
           <span class="icon-btn" title="删除" onclick="AccountView.delReim('${e.id}','${r.id}',1)">🗑</span>
@@ -2222,7 +2212,7 @@ const AccountView = {
         <div class="reim-form-source">
           <span class="cat-icon-sm">${icon}</span>
           <span>${e.category}</span>
-          <span class="reim-form-amt">¥${fmtMoney(parseFloat(e.amount))}</span>
+          <span class="reim-form-amt">${fmtMoney(parseFloat(e.amount))}</span>
         </div>
         <div class="reim-form-meta">${(e.date||'').slice(5,16).replace('T',' ')} · ${e.account}</div>
       </div>
@@ -2250,7 +2240,7 @@ const AccountView = {
     const amt = parseFloat($('#refund-amount').value);
     if (!amt || amt <= 0) { Toast.show('请输入有效金额', 'error'); return; }
     const remain = this._refundRemain(e);
-    if (amt > remain + 0.005) { Toast.show(`退款金额不能超过剩余可退金额 ¥${fmtMoney(remain)}`, 'error'); return; }
+    if (amt > remain + 0.005) { Toast.show(`退款金额不能超过剩余可退金额 ${fmtMoney(remain)}`, 'error'); return; }
     const date = $('#refund-date').value || todayStr();
     const toAccount = $('#refund-account').value;
     const note = $('#refund-note').value.trim();
@@ -2289,9 +2279,9 @@ const AccountView = {
         <div class="reim-form-source">
           <span class="cat-icon-sm">${CONFIG.categoryIcons[e.category]||'📌'}</span>
           <span>${e.category}</span>
-          <span class="reim-form-amt">账单 ¥${fmtMoney(parseFloat(e.amount))}</span>
+          <span class="reim-form-amt">账单 ${fmtMoney(parseFloat(e.amount))}</span>
         </div>
-        <div class="reim-form-meta">原账户 ${e.account} · 可退上限 ¥${fmtMoney(maxAmt)}</div>
+        <div class="reim-form-meta">原账户 ${e.account} · 可退上限 ${fmtMoney(maxAmt)}</div>
       </div>
       <div class="form-group"><label class="form-label">退款金额</label>
         <input class="form-input" type="number" step="0.01" id="ref-e-amount" value="${parseFloat(r.amount).toFixed(2)}">
@@ -2316,7 +2306,7 @@ const AccountView = {
     if (!e || !r) return;
     const amt = parseFloat($('#ref-e-amount').value);
     if (!amt || amt <= 0) { Toast.show('请输入有效金额', 'error'); return; }
-    if (amt > maxAmt + 0.005) { Toast.show(`退款金额不能超过 ¥${fmtMoney(maxAmt)}`, 'error'); return; }
+    if (amt > maxAmt + 0.005) { Toast.show(`退款金额不能超过 ${fmtMoney(maxAmt)}`, 'error'); return; }
     const date = $('#ref-e-date').value || r.date;
     const toAccount = $('#ref-e-account').value;
     const note = $('#ref-e-note').value.trim();
@@ -2373,15 +2363,15 @@ const AccountView = {
     html += `<div class="reim-summary-cards">
       <div class="glass reim-card">
         <div class="reim-card-label">待报销</div>
-        <div class="reim-card-val pending">¥${fmtMoney(summary.pending)}</div>
+        <div class="reim-card-val pending">${fmtMoney(summary.pending)}</div>
       </div>
       <div class="glass reim-card">
         <div class="reim-card-label">已报销</div>
-        <div class="reim-card-val done">¥${fmtMoney(summary.done)}</div>
+        <div class="reim-card-val done">${fmtMoney(summary.done)}</div>
       </div>
       <div class="glass reim-card">
         <div class="reim-card-label">总报销</div>
-        <div class="reim-card-val total">¥${fmtMoney(summary.total)}</div>
+        <div class="reim-card-val total">${fmtMoney(summary.total)}</div>
       </div>
     </div>`;
 
@@ -2410,7 +2400,7 @@ const AccountView = {
             <div class="reim-day-header">
               <span class="reim-day-bar"></span>
               <span class="reim-day-date">${this._reimDayLabel(d)}</span>
-              <span class="reim-day-amt">待报:¥${fmtMoney(dayTotal)}</span>
+              <span class="reim-day-amt">待报:${fmtMoney(dayTotal)}</span>
             </div>`;
           items.forEach(e => {
             const isSelected = this.selectedReimIds.includes(e.id);
@@ -2429,7 +2419,7 @@ const AccountView = {
                 </div>
                 <div class="reim-item-bot"><span class="reim-account">${e.account}</span></div>
               </div>
-              <div class="reim-item-amt neg">¥${fmtMoney(this._pendingRemain(e))}</div>
+              <div class="reim-item-amt neg">${fmtMoney(this._pendingRemain(e))}</div>
             </div>`;
           });
           html += `</div>`;
@@ -2449,7 +2439,7 @@ const AccountView = {
             <div class="reim-day-header">
               <span class="reim-day-bar"></span>
               <span class="reim-day-date">${this._reimDayLabel(d)}</span>
-              <span class="reim-day-amt">已报:¥${fmtMoney(dayTotal)}</span>
+              <span class="reim-day-amt">已报:${fmtMoney(dayTotal)}</span>
             </div>`;
           items.forEach(({ r, e }) => {
             const icon = CONFIG.categoryIcons[e.category] || '📌';
@@ -2466,7 +2456,7 @@ const AccountView = {
                 </div>
                 <div class="reim-item-bot"><span class="reim-account">${e.account} → ${r.toAccount}</span></div>
               </div>
-              <div class="reim-item-amt pos">+¥${fmtMoney(parseFloat(r.amount))}</div>
+              <div class="reim-item-amt pos">+${fmtMoney(parseFloat(r.amount))}</div>
               <div class="reim-item-ops">
                 <span class="icon-btn" title="编辑" onclick="event.stopPropagation();AccountView.openReimEdit('${e.id}','${r.id}')">✏️</span>
                 <span class="icon-btn" title="删除" onclick="event.stopPropagation();AccountView.delReim('${e.id}','${r.id}')">🗑</span>
@@ -2483,7 +2473,7 @@ const AccountView = {
       html += `<div class="reim-bottom-bar">
         <div class="reim-bottom-inner">
           <div class="reim-check ${selTotal>0.005?'checked':''}" onclick="AccountView._toggleSelectAllPending()"></div>
-          <button class="btn btn-reim-action ${selTotal<0.005?'disabled':''}" onclick="${selTotal>0.005?'AccountView.openReimAccountPicker()':'void(0)'}">报销(¥${fmtMoney(selTotal)})</button>
+          <button class="btn btn-reim-action ${selTotal<0.005?'disabled':''}" onclick="${selTotal>0.005?'AccountView.openReimAccountPicker()':'void(0)'}">报销(${fmtMoney(selTotal)})</button>
         </div>
       </div>`;
     }
@@ -2722,7 +2712,7 @@ const AccountView = {
     const gid = uid();
     Store.addAccount({ type: 'transfer', transferDir: 'out', amount, date, account: from, category: '转账', transferGroup: gid, note: note ? `${note} · 转出至${to}` : `转出至${to}` });
     Store.addAccount({ type: 'transfer', transferDir: 'in', amount, date, account: to, category: '转账', transferGroup: gid, note: note ? `${note} · 转入自${from}` : `转入自${from}` });
-    Toast.show(`已互转 ¥${fmtMoney(amount)}`);
+    Toast.show(`已互转 ${fmtMoney(amount)}`);
     Modal.close();
     this.render();
   }
@@ -3442,14 +3432,55 @@ const BeadView = {
           ${fams.map(f => `<option value="${f.code}">${f.code}系 · ${f.name}</option>`).join('')}
         </select>
       </div>
+      <div class="glass bead-exp-preview">
+        <div class="bead-exp-preview-head">
+          <span class="bead-exp-preview-title">📋 导出预览</span>
+          <span class="bead-exp-count" id="beadExpCount">0 项</span>
+        </div>
+        <div class="bead-exp-list" id="beadExpPreview"></div>
+      </div>
       <div class="form-actions">
         <button class="btn btn-glass" onclick="Modal.close()">取消</button>
         <button class="btn btn-primary" onclick="BeadView._doExport()">导出 CSV</button>
       </div>
     `);
-    $('#beadExpRange').addEventListener('change', e => {
-      $('#beadExpFamWrap').style.display = e.target.value === 'family' ? 'block' : 'none';
-    });
+    const refresh = () => {
+      const range = $('#beadExpRange').value;
+      $('#beadExpFamWrap').style.display = range === 'family' ? 'block' : 'none';
+      this._renderExpPreview(range, range === 'family' ? $('#beadExpFam').value : null);
+    };
+    $('#beadExpRange').addEventListener('change', refresh);
+    $('#beadExpFam').addEventListener('change', refresh);
+    refresh();
+  },
+  _renderExpPreview(range, famCode) {
+    const threshold = Store.getBeadThreshold();
+    let beads = getAllBeads();
+    const stock = Store.getBeadStock();
+    if (range === 'instock') beads = beads.filter(b => (stock[b.num]?.stock || 0) > 0);
+    else if (range === 'low') beads = beads.filter(b => (stock[b.num]?.stock || 0) <= threshold);
+    else if (range === 'family' && famCode) beads = beads.filter(b => b.family === famCode);
+    const cnt = $('#beadExpCount');
+    if (cnt) cnt.textContent = beads.length + ' 项';
+    const el = $('#beadExpPreview');
+    if (!el) return;
+    if (beads.length === 0) { el.innerHTML = '<div class="bead-log-empty">没有符合条件的色号</div>'; return; }
+    el.innerHTML = beads.map(b => {
+      const v = stock[b.num]?.stock || 0;
+      const st = beadStatus(v, threshold);
+      const s = BEAD_STATUS[st];
+      return `<div class="bead-row">
+        <span class="bead-swatch" style="background:${getBeadColor(b.num, b.hex)}" title="${getBeadColor(b.num, b.hex)}"></span>
+        <div class="bead-info">
+          <div class="bead-num">${b.num}</div>
+          <div class="bead-name">${escHtml(b.name)}</div>
+        </div>
+        <div class="bead-stock">
+          <span class="bead-qty">${fmtInt(v)}</span>
+          <span class="bead-status ${s.cls}">${s.label}</span>
+        </div>
+      </div>`;
+    }).join('');
   },
   _doExport() {
     const range = $('#beadExpRange').value;
@@ -3577,7 +3608,7 @@ const App = {
     set('launchToday', '¥' + (todayExpense < 1000 ? fmtMoney(todayExpense) : (todayExpense / 1000).toFixed(1) + 'k'));
     set('launchMonth', '¥' + (monthExpense < 1000 ? fmtMoney(monthExpense) : (monthExpense / 1000).toFixed(1) + 'k'));
     const wEl = document.getElementById('launchWeight');
-    if (wEl) wEl.innerHTML = latestWeight ? `${latestWeight.weight}<span class="unit">kg</span>` : '--';
+    if (wEl) wEl.innerHTML = latestWeight ? `${Number(latestWeight.weight).toFixed(2)}<span class="unit">kg</span>` : '--';
   },
   migrate() {
     // 迁移旧账户名到新账户名
