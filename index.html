@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>All</title>
+
+  <!-- PWA / 移动端全屏 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="All">
+  <meta name="theme-color" content="#06060c">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- 图标 -->
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=91">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
+<script>
+(function(){
+  try{
+    var beacon=new BeaconAction({
+      appkey:'0WEB06U85YBSLJNL',
+      versionCode:'1.0.0',
+      channelID:'share',
+      delay:1000,
+      sessionDuration:30*60*1000,
+      isOversea:false,
+      needReportRqdEvent:false
+    });
+    beacon.onDirectUserAction('preview_page_view',{
+      'url':location.href,
+      'referrer':document.referrer,
+      'title':document.title,
+      'sandbox_id':'0e38a244fb0e46cb9073dd22e45f65cf'
+    });
+  }catch(e){}
+})();
+</script></head>
+<body>
+  <!-- 背景光晕 -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- 启动动画：首页实时预览放大铺满屏幕 -->
+  <div class="app-launch" id="appLaunch">
+    <div class="launch-card" id="launchCard">
+      <div class="launch-card-top">
+        <div class="launch-greet">
+          <div class="launch-hi" id="launchHi">你好</div>
+          <div class="launch-name">程呈</div>
+        </div>
+        <div class="launch-date">
+          <span class="launch-date-day" id="launchDay">--</span>
+          <span class="launch-date-week" id="launchWeek">--</span>
+        </div>
+      </div>
+      <div class="launch-stats">
+        <div class="launch-stat">
+          <div class="launch-stat-val" id="launchToday">--</div>
+          <div class="launch-stat-label">今日支出</div>
+        </div>
+        <div class="launch-stat">
+          <div class="launch-stat-val" id="launchMonth">--</div>
+          <div class="launch-stat-label">本月支出</div>
+        </div>
+        <div class="launch-stat">
+          <div class="launch-stat-val" id="launchWeight">--</div>
+          <div class="launch-stat-label">当前体重</div>
+        </div>
+      </div>
+      <div class="launch-foot">All · 工作台</div>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- 主内容区 -->
+    <main class="content" id="content">
+      <section class="view active" id="view-home"></section>
+      <section class="view" id="view-account"></section>
+      <section class="view" id="view-health"></section>
+      <section class="view" id="view-notebook"></section>
+      <section class="view" id="view-bead"></section>
+    </main>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav" id="bottomNav">
+      <a class="nav-item active" data-view="home">
+        <img class="nav-icon-img" src="nav-home.png" alt="首页">
+        <span>首页</span>
+      </a>
+      <a class="nav-item" data-view="account">
+        <img class="nav-icon-img" src="nav-account.png" alt="记账">
+        <span>记账</span>
+      </a>
+      <a class="nav-item" data-view="health">
+        <img class="nav-icon-img" src="nav-health.png" alt="健康">
+        <span>健康</span>
+      </a>
+      <a class="nav-item" data-view="notebook">
+        <img class="nav-icon-img nav-icon-face" src="notebook-icon.jpg" alt="记事本">
+        <span>记事本</span>
+      </a>
+      <a class="nav-item" data-view="bead">
+        <img class="nav-icon-img nav-icon-face nav-bead-face" src="nav-bead.jpg" alt="拼豆">
+        <span>拼豆</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- 模态框 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modal">
+      <div class="modal-grip"></div>
+      <div class="modal-header" id="modalHeader"></div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/bead-data.js?v=91"></script>
+  <script src="js/bead-stock.js?v=91"></script>
+  <script src="js/app.js?v=91"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              newWorker.postMessage({type: 'SKIP_WAITING'});
+              location.reload();
+            }
+          });
+        });
+      }).catch(() => {});
+    }
+  </script>
+</body>
+</html>
