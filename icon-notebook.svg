@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="bg5" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fdf2f8"/>
+      <stop offset="1" stop-color="#fae8ff"/>
+    </linearGradient>
+    <linearGradient id="page-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#fce7f3"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="24" fill="#faf5ff"/>
+  <rect x="18" y="18" width="64" height="64" rx="18" fill="url(#bg5)" stroke="#f9a8d4" stroke-width="2"/>
+  <!-- 翻开的书 -->
+  <g transform="translate(50,52)">
+    <!-- 左页 -->
+    <path d="M-1 -14 C-10 -18 -20 -16 -22 -12 L-22 14 C-20 10 -10 8 -1 12 Z" fill="url(#page-grad)" stroke="#e879f9" stroke-width="1.2"/>
+    <!-- 右页 -->
+    <path d="M1 -14 C10 -18 20 -16 22 -12 L22 14 C20 10 10 8 1 12 Z" fill="url(#page-grad)" stroke="#e879f9" stroke-width="1.2"/>
+    <!-- 书脊 -->
+    <line x1="-1" y1="-13" x2="-1" y2="13" stroke="#d946ef" stroke-width="1.5"/>
+    <!-- 左页横线 -->
+    <g stroke="#f0abfc" stroke-width="1.4" stroke-linecap="round">
+      <line x1="-18" y1="-4" x2="-4" y2="-6"/>
+      <line x1="-18" y1="2" x2="-4" y2="0"/>
+      <line x1="-18" y1="8" x2="-4" y2="6"/>
+    </g>
+    <!-- 右页横线 -->
+    <g stroke="#f0abfc" stroke-width="1.4" stroke-linecap="round">
+      <line x1="4" y1="-6" x2="18" y2="-4"/>
+      <line x1="4" y1="0" x2="18" y2="2"/>
+      <line x1="4" y1="6" x2="18" y2="8"/>
+    </g>
+  </g>
+</svg>
