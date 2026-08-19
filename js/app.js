@@ -3468,9 +3468,9 @@ const BeadView = {
       </div>
       <div class="form-group" id="beadExpFamWrap" style="display:none">
         <label class="form-label">选择色系</label>
-        <select class="form-input" id="beadExpFam">
-          ${fams.map(f => `<option value="${f.code}">${f.code}系 · ${f.name}</option>`).join('')}
-        </select>
+        <div class="filter-chips" id="beadExpFam">
+          ${fams.map((f,i) => `<div class="filter-chip${i===0?' active':''}" data-fam="${f.code}"><span class="bead-swatch sm" style="background:${f.color}"></span>${f.code}系</div>`).join('')}
+        </div>
       </div>
       <div class="glass bead-exp-preview">
         <div class="bead-exp-preview-head">
@@ -3488,7 +3488,9 @@ const BeadView = {
       const active = $('#beadExpRange .filter-chip.active');
       const range = active ? active.dataset.range : 'all';
       $('#beadExpFamWrap').style.display = range === 'family' ? 'block' : 'none';
-      this._renderExpPreview(range, range === 'family' ? $('#beadExpFam').value : null);
+      const famActive = $('#beadExpFam .filter-chip.active');
+      const famCode = famActive ? famActive.dataset.fam : null;
+      this._renderExpPreview(range, range === 'family' ? famCode : null);
     };
     $$('#beadExpRange .filter-chip').forEach(ch => {
       ch.addEventListener('click', () => {
@@ -3497,7 +3499,13 @@ const BeadView = {
         refresh();
       });
     });
-    $('#beadExpFam').addEventListener('change', refresh);
+    $$('#beadExpFam .filter-chip').forEach(ch => {
+      ch.addEventListener('click', () => {
+        $$('#beadExpFam .filter-chip').forEach(c => c.classList.remove('active'));
+        ch.classList.add('active');
+        refresh();
+      });
+    });
     refresh();
   },
   _renderExpPreview(range, famCode) {
@@ -3537,7 +3545,7 @@ const BeadView = {
     const stock = Store.getBeadStock();
     if (range === 'instock') beads = beads.filter(b => (stock[b.num]?.stock || 0) > 0);
     else if (range === 'low') beads = beads.filter(b => (stock[b.num]?.stock || 0) <= threshold);
-    else if (range === 'family') { const fc = $('#beadExpFam').value; beads = beads.filter(b => b.family === fc); }
+    else if (range === 'family') { const famActive = $('#beadExpFam .filter-chip.active'); const fc = famActive ? famActive.dataset.fam : null; if (fc) beads = beads.filter(b => b.family === fc); }
     const header = ['色系', '色号', '颜色名称', 'HEX色值', '库存数量', '状态', '备注'];
     const lines = [header.map(csvCell).join(',')];
     beads.forEach(b => {
