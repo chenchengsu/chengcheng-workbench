@@ -23,13 +23,14 @@
   --text-secondary: rgba(255, 255, 255, 0.55);
   --text-tertiary: rgba(255, 255, 255, 0.32);
 
-  /* 粉色霓虹 */
-  --pink: #ff3d7f;
-  --pink-light: #ff6ba0;
-  --pink-dark: #e91e63;
-  --pink-glow: rgba(255, 61, 127, 0.35);
-  --pink-bg: rgba(255, 61, 127, 0.12);
-  --pink-border: rgba(255, 61, 127, 0.25);
+  /* 银紫霓虹（与舞台背景图冷调一致） */
+  --pink: #a78bfa;
+  --pink-light: #c9b8ff;
+  --pink-dark: #7c5cf5;
+  --pink-glow: rgba(167, 139, 250, 0.35);
+  --pink-bg: rgba(167, 139, 250, 0.12);
+  --pink-border: rgba(167, 139, 250, 0.25);
+  --primary: #a78bfa;
 
   /* 状态色 */
   --success: #4ade80;
@@ -104,7 +105,7 @@ ul, ol { list-style: none; }
   left: -20%;
   width: 70%;
   height: 50%;
-  background: radial-gradient(circle, rgba(255, 61, 127, 0.3), transparent 60%);
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.3), transparent 60%);
   animation: float1 20s ease-in-out infinite;
 }
 .orb-2 {
@@ -120,7 +121,7 @@ ul, ol { list-style: none; }
   right: -10%;
   width: 40%;
   height: 35%;
-  background: radial-gradient(circle, rgba(255, 61, 127, 0.15), transparent 60%);
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.15), transparent 60%);
   animation: float3 18s ease-in-out infinite;
 }
 @keyframes float1 {
@@ -175,7 +176,6 @@ ul, ol { list-style: none; }
 .view {
   display: none;
   padding: 20px 18px 100px;
-  animation: fadeIn 0.35s ease;
 }
 .view.active { display: block; }
 @keyframes fadeIn {
@@ -200,7 +200,7 @@ ul, ol { list-style: none; }
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 50%, rgba(255,61,127,0.08));
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 50%, rgba(167,139,250,0.08));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -214,7 +214,7 @@ ul, ol { list-style: none; }
 }
 .glass-pink {
   border-color: var(--pink-border);
-  box-shadow: var(--shadow-card), 0 0 20px rgba(255, 61, 127, 0.08);
+  box-shadow: var(--shadow-card), 0 0 20px rgba(167, 139, 250, 0.08);
 }
 
 /* ===== 页面标题 ===== */
@@ -249,10 +249,10 @@ ul, ol { list-style: none; }
 .btn-primary {
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   color: #fff;
-  box-shadow: 0 4px 16px rgba(255, 61, 127, 0.3);
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.3);
 }
 .btn-primary:hover {
-  box-shadow: 0 6px 24px rgba(255, 61, 127, 0.45);
+  box-shadow: 0 6px 24px rgba(167, 139, 250, 0.45);
   transform: translateY(-1px);
 }
 .btn-glass {
@@ -321,7 +321,7 @@ ul, ol { list-style: none; }
   font-size: 14px;
   transition: all 0.2s;
 }
-.profile-del:hover { background: rgba(255, 61, 127, 0.15); border-color: var(--danger); color: var(--danger); }
+.profile-del:hover { background: rgba(167, 139, 250, 0.15); border-color: var(--danger); color: var(--danger); }
 
 .btn-danger {
   background: linear-gradient(135deg, var(--danger), #dc2626);
@@ -479,8 +479,8 @@ ul, ol { list-style: none; }
 }
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--pink-border);
-  background: rgba(255, 61, 127, 0.04);
-  box-shadow: 0 0 0 3px rgba(255, 61, 127, 0.1);
+  background: rgba(167, 139, 250, 0.04);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
 }
 .form-textarea { resize: vertical; min-height: 80px; }
 .form-row { display: flex; gap: 10px; }
@@ -526,7 +526,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 }
 .date-field:hover {
   border-color: var(--pink-border);
-  background: rgba(255, 61, 127, 0.04);
+  background: rgba(167, 139, 250, 0.04);
 }
 .date-field-text {
   flex: 1;
@@ -596,7 +596,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
-  animation: slideDown 0.3s ease;
+}
 }
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-20px); }
@@ -725,8 +725,8 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
 }
 .home-cloud-btn:hover {
-  background: rgba(255, 61, 127, 0.14);
-  border-color: rgba(255, 61, 127, 0.4);
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.4);
 }
 .home-cloud-btn:active { transform: scale(0.92); }
 
@@ -809,7 +809,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border-radius: var(--r-md);
 }
 .home-grid-card:active { transform: scale(0.96); }
-.home-grid-card:hover { border-color: rgba(255, 61, 127, 0.25); }
+.home-grid-card:hover { border-color: rgba(167, 139, 250, 0.25); }
 .hgc-icon {
   width: 36px;
   height: 36px;
@@ -1057,7 +1057,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 4px 16px rgba(255, 61, 127, 0.4);
+  box-shadow: 0 4px 16px rgba(167, 139, 250, 0.4);
   transform: scale(1.05);
 }
 .calendar-day.has-tasks::after {
@@ -1496,12 +1496,12 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   flex-shrink: 0;
 }
 .filter-chip:hover {
-  border-color: rgba(255, 61, 127, 0.2);
+  border-color: rgba(167, 139, 250, 0.2);
   color: var(--text-primary);
 }
 .filter-chip.active {
-  background: rgba(255, 61, 127, 0.15);
-  border-color: rgba(255, 61, 127, 0.4);
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.4);
   color: var(--pink-light);
   font-weight: 600;
 }
@@ -1522,8 +1522,8 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 }
 .filter-reset-btn svg { width: 14px; height: 14px; }
 .filter-reset-btn:hover {
-  background: rgba(255, 61, 127, 0.12);
-  border-color: rgba(255, 61, 127, 0.3);
+  background: rgba(167, 139, 250, 0.12);
+  border-color: rgba(167, 139, 250, 0.3);
   color: var(--pink-light);
 }
 .filter-reset-btn:active {
@@ -1665,7 +1665,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .type-btn.active {
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   color: #fff;
-  box-shadow: 0 2px 12px rgba(255, 61, 127, 0.3);
+  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.3);
 }
 
 /* 分类网格 */
@@ -1694,7 +1694,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .category-chip.active {
   background: var(--pink-bg);
   border-color: var(--pink-border);
-  box-shadow: 0 2px 12px rgba(255, 61, 127, 0.15);
+  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.15);
 }
 .category-chip .cat-icon { font-size: 18px; }
 .category-chip .cat-name { font-size: 10px; color: var(--text-secondary); }
@@ -1790,7 +1790,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   height: 22px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
-  background: rgba(255, 61, 127, 0.08);
+  background: rgba(167, 139, 250, 0.08);
   color: var(--danger);
   cursor: pointer;
   flex-shrink: 0;
@@ -1799,7 +1799,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 }
 .btn-del-account svg { width: 12px; height: 12px; }
 .btn-del-account:hover {
-  background: rgba(255, 61, 127, 0.2);
+  background: rgba(167, 139, 250, 0.2);
   border-color: var(--danger);
   transform: scale(1.1);
 }
@@ -2040,7 +2040,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   border-color: var(--pink);
   color: #fff;
-  box-shadow: 0 2px 12px rgba(255, 61, 127, 0.3);
+  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.3);
 }
 .account-field-chip .af-icon { font-size: 14px; }
 .account-field-chip .af-name { font-size: 12px; font-weight: 500; }
@@ -2079,7 +2079,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   font-weight: 700;
   line-height: 1;
   color: var(--pink);
-  text-shadow: 0 0 12px rgba(255, 61, 127, 0.4);
+  text-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
 }
 .transfer-note {
   margin-top: 8px;
@@ -2106,7 +2106,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .transfer-swap:hover {
   background: var(--pink-bg);
   border-color: var(--pink-border);
-  box-shadow: 0 2px 12px rgba(255, 61, 127, 0.15);
+  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.15);
 }
 
 /* 月份选择条 */
@@ -2173,7 +2173,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 2px 12px rgba(255, 61, 127, 0.3);
+  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.3);
 }
 
 .year-tabs {
@@ -2210,7 +2210,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   background: linear-gradient(135deg, var(--pink), var(--pink-dark));
   color: #fff;
   font-weight: 600;
-  box-shadow: 0 2px 12px rgba(255, 61, 127, 0.3);
+  box-shadow: 0 2px 12px rgba(167, 139, 250, 0.3);
 }
 
 /* ========================================
@@ -2327,7 +2327,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(255, 61, 127, 0.4);
+  box-shadow: 0 4px 20px rgba(167, 139, 250, 0.4);
   pointer-events: auto;
   transition: all 0.2s;
   color: #fff;
@@ -2335,7 +2335,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 }
 .fab-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 28px rgba(255, 61, 127, 0.55);
+  box-shadow: 0 6px 28px rgba(167, 139, 250, 0.55);
 }
 .fab-btn:active { transform: scale(0.95); }
 
@@ -2347,7 +2347,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(255, 61, 127, 0.12), transparent 60%),
+    radial-gradient(1200px 600px at 50% -10%, rgba(167, 139, 250, 0.12), transparent 60%),
     radial-gradient(900px 500px at 50% 110%, rgba(99, 102, 241, 0.12), transparent 60%);
 }
 .guest-card {
@@ -2517,7 +2517,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   background: var(--pink) !important;
   color: #fff !important;
   font-weight: 600;
-  box-shadow: 0 0 6px rgba(255,61,127,0.35);
+  box-shadow: 0 0 6px rgba(167,139,250,0.35);
 }
 .pc-day.predict {
   background: #a78bfa !important;
@@ -2660,7 +2660,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   object-position: center 32% !important;
 }
 .nav-item.active .nav-icon-face {
-  filter: grayscale(0) brightness(1.05) opacity(1) drop-shadow(0 0 6px rgba(255,61,127,0.5)) !important;
+  filter: grayscale(0) brightness(1.05) opacity(1) drop-shadow(0 0 6px rgba(167,139,250,0.5)) !important;
   transform: scale(1.08);
 }
 
@@ -2742,7 +2742,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .bead-ov-card.warn .bead-ov-value { color: var(--pink-light); }
 .bead-ov-clickable { cursor: pointer; transition: transform 0.15s ease, border-color 0.2s ease; }
 .bead-ov-clickable:active { transform: scale(0.96); }
-.bead-ov-clickable:hover { border-color: rgba(255, 61, 127, 0.3); }
+.bead-ov-clickable:hover { border-color: rgba(167, 139, 250, 0.3); }
 
 /* 低库存色号列表 */
 .bead-low-list { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow-y: auto; }
@@ -2758,12 +2758,12 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   transition: transform 0.15s ease, border-color 0.2s ease;
 }
 .bead-low-item:active { transform: scale(0.98); }
-.bead-low-item:hover { border-color: rgba(255, 61, 127, 0.3); }
+.bead-low-item:hover { border-color: rgba(167, 139, 250, 0.3); }
 .bead-low-info { flex: 1; min-width: 0; }
 .bead-low-info .bead-name { font-size: 12px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bead-flash { animation: beadFlash 1.4s ease; }
 @keyframes beadFlash {
-  0% { background: rgba(255, 61, 127, 0.35); box-shadow: 0 0 0 2px var(--pink); }
+  0% { background: rgba(167, 139, 250, 0.35); box-shadow: 0 0 0 2px var(--pink); }
   100% { background: transparent; box-shadow: none; }
 }
 
@@ -2825,8 +2825,8 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .fam-chip:hover { background: rgba(255,255,255,0.08); }
 .fam-chip.active {
   border-color: var(--pink);
-  background: linear-gradient(135deg, rgba(255,61,127,0.18), rgba(255,107,160,0.12));
-  box-shadow: 0 0 0 1px var(--pink), 0 4px 14px rgba(255,61,127,0.18);
+  background: linear-gradient(135deg, rgba(167,139,250,0.18), rgba(255,107,160,0.12));
+  box-shadow: 0 0 0 1px var(--pink), 0 4px 14px rgba(167,139,250,0.18);
 }
 .fam-dot {
   width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
@@ -2954,7 +2954,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   width: 26px; height: 26px;
   border-radius: 8px;
   border: 1px solid var(--glass-border);
-  background: rgba(255,61,127,0.12);
+  background: rgba(167,139,250,0.12);
   color: var(--pink-light);
   font-size: 13px;
   cursor: pointer;
@@ -3036,7 +3036,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 28px;
   padding: 26px 22px 20px;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 61, 127, 0.12);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(167, 139, 250, 0.12);
   color: #fff;
   transform: scale(0.55);
   opacity: 0;
@@ -3451,7 +3451,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .btn-reim-action {
   flex:1; padding:12px; border-radius:14px; font-size:15px; font-weight:600;
   background:linear-gradient(135deg,var(--pink),var(--pink-dark)); color:#fff; border:none;
-  cursor:pointer; box-shadow:0 4px 16px rgba(255,61,127,0.25);
+  cursor:pointer; box-shadow:0 4px 16px rgba(167,139,250,0.25);
 }
 .btn-reim-action.disabled { opacity:.4; cursor:not-allowed; }
 
