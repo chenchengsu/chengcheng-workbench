@@ -3691,20 +3691,9 @@ const App = {
 
 document.addEventListener('DOMContentLoaded', () => App.init());
 
-// 启动动画：图标放大铺满屏幕后淡出，露出应用
+// 启动动画已移除：打开直接显示首页背景图
 (function () {
   const el = document.getElementById('appLaunch');
-  if (!el) return;
-  let done = false;
-  const finish = () => {
-    if (done) return;
-    done = true;
-    el.classList.add('done');
-    setTimeout(() => el.remove(), 600);
-  };
-  // 动画约 0.72s，预留停留时间看清首页预览后淡出
-  setTimeout(finish, 1300);
-  // 兜底：load 后 2.2s 强制收尾，防止动画被中断时遮挡界面
-  window.addEventListener('load', () => setTimeout(finish, 2200));
+  if (el) el.remove();
 })();
 
