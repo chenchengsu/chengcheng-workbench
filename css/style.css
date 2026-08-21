@@ -3219,7 +3219,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 
 /* 工作台信息卡（磨砂透明度 0：无底色无模糊） */
 .info-card {
-  margin-top: clamp(64px, 13vh, 150px); padding: 16px; border-radius: 20px;
+  margin-top: clamp(120px, 22vh, 240px); padding: 16px; border-radius: 20px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(22px) saturate(150%);
