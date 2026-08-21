@@ -568,10 +568,10 @@ const HomeView = {
       </div>
 
       <div class="tool-row">
-        <div class="tool-mini" onclick="App.navigate('account')"><span>💰</span>记账</div>
-        <div class="tool-mini" onclick="App.navigate('health','weight')"><span>⚖️</span>健康</div>
-        <div class="tool-mini" onclick="App.navigate('notebook')"><span>📝</span>记事</div>
-        <div class="tool-mini" onclick="App.navigate('bead')"><span>🎨</span>拼豆</div>
+        <div class="tool-mini" onclick="App.navigate('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>记账</div>
+        <div class="tool-mini" onclick="App.navigate('health','weight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>健康</div>
+        <div class="tool-mini" onclick="App.navigate('notebook')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>记事</div>
+        <div class="tool-mini" onclick="App.navigate('bead')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>拼豆</div>
       </div>
 
       <div style="height:28px"></div>
