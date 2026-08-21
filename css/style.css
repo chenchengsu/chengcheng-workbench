@@ -3995,7 +3995,7 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 .fab-export,
 .empty-state,
 .tab-bar {
-  background: rgba(10, 10, 20, 0.38);
+  background: rgba(10, 10, 20, 0.52);
 }
 /* 小控件（输入框 / 各类 chip / 小按钮）：浅色薄底，叠在卡片上区分层次 */
 .form-input, .form-select, .form-textarea,
@@ -4003,6 +4003,6 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 .account-field-chip, .period-tab, .icon-btn, .btn-glass,
 .bead-step, .bead-edit, .bead-adj-cancel, .nb-todo-add-row,
 .bead-adj-pop, .import-stat {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.12);
 }
 
