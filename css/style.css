@@ -608,52 +608,50 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 
 /* ===== 底部导航 ===== */
 .bottom-nav {
-  flex-shrink: 0;
-  display: flex;
-  justify-content: space-evenly;
-  padding: 6px 12px calc(8px + env(safe-area-inset-bottom, 0px));
-  background: rgba(8, 8, 14, 0.75);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border-top: 1px solid var(--glass-border);
-  position: relative;
-}
-.bottom-nav::before {
-  content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  left: 18px;
+  right: 18px;
+  z-index: 100;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  background: rgba(8, 8, 16, 0.74);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 28px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
 }
+.bottom-nav::before { display: none; }
 .nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 6px 10px;
-  color: var(--text-tertiary);
+  gap: 3px;
+  padding: 4px 8px;
+  color: rgba(255,255,255,0.55);
   font-size: 10px;
   font-weight: 500;
-  transition: all 0.2s;
-  border-radius: var(--r-xs);
+  transition: color 0.2s, transform 0.15s;
+  border-radius: 14px;
   -webkit-tap-highlight-color: transparent;
 }
-.nav-item.active { color: var(--pink); }
-.nav-item.active .nav-icon { filter: drop-shadow(0 0 6px rgba(255, 61, 127, 0.5)); }
+.nav-item:active { transform: scale(0.92); }
+.nav-item.active { color: #ffffff; }
+.nav-item.active .nav-icon-img {
+  color: #ffffff;
+  filter: drop-shadow(0 0 8px rgba(167,139,250,0.55));
+  transform: translateY(-1px);
+}
 .nav-icon { width: 22px; height: 22px; }
 .nav-icon-img {
-  width: 26px;
-  height: 26px;
-  object-fit: cover;
-  border-radius: 50%;
-  transition: all 0.25s ease;
-  filter: grayscale(0.3) brightness(0.85) opacity(0.7);
-}
-.nav-item.active .nav-icon-img {
-  filter: grayscale(0) brightness(1.05) opacity(1) drop-shadow(0 0 6px rgba(255, 61, 127, 0.5));
-  transform: scale(1.08);
+  width: 22px;
+  height: 22px;
+  color: currentColor;
+  transition: color 0.2s, transform 0.2s, filter 0.2s;
 }
 
 /* ========================================
@@ -3162,8 +3160,8 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image: url('../stage-hero.png');
   background-position: center 15%; background-size: cover; background-repeat: no-repeat;
-  opacity: 0; transform: scale(1.04);
-  transition: opacity 1s ease, transform 1.4s ease;
+  opacity: 1; transform: scale(1);
+  transition: none;
   filter: brightness(1.0) saturate(1.05) contrast(1.02);
 }
 .stage-hero-bg.show {
