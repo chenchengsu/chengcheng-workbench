@@ -3161,7 +3161,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .stage-hero-bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image: url('../stage-hero.png');
-  background-position: center 20%; background-size: cover; background-repeat: no-repeat;
+  background-position: center 15%; background-size: cover; background-repeat: no-repeat;
   opacity: 0; transform: scale(1.04);
   transition: opacity 1s ease, transform 1.4s ease;
   filter: brightness(1.0) saturate(1.05) contrast(1.02);
@@ -3172,12 +3172,12 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .stage-hero-bg::after {
   content: ''; position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 50% 25%, rgba(124,58,237,0.12), transparent 60%),
+    radial-gradient(ellipse 120% 80% at 50% 22%, rgba(124,58,237,0.10), transparent 58%),
     linear-gradient(180deg,
-      rgba(6,6,12,0.38) 0%,
-      rgba(6,6,12,0.05) 35%,
-      rgba(6,6,12,0.08) 60%,
-      rgba(46,16,101,0.28) 80%,
+      rgba(6,6,12,0.16) 0%,
+      rgba(6,6,12,0.02) 28%,
+      rgba(6,6,12,0.04) 55%,
+      rgba(46,16,101,0.22) 78%,
       rgba(6,6,12,0.92) 100%);
   pointer-events: none;
 }
@@ -3188,154 +3188,177 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   mix-blend-mode: overlay;
 }
 
-.fan-home.v2 {
+.fan-home.v3 {
   position: relative; z-index: 1;
-  padding: calc(18px + env(safe-area-inset-top)) 22px 0;
+  padding: calc(14px + env(safe-area-inset-top)) 20px 0;
   min-height: 100%;
   display: flex; flex-direction: column;
 }
 
-/* 顶部问候 */
-.fan-v2-header {
-  margin: 6px 2px 18px;
+/* 顶部艺人与场次信息 */
+.concert-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 2px 2px 10px;
 }
-.fan-v2-greet {
-  font-size: 15px; font-weight: 600;
-  color: rgba(255,255,255,0.45); letter-spacing: 0.04em;
+.concert-tagline {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.52); text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
-.fan-v2-date {
+.concert-bell {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: blur(12px);
+  cursor: pointer; transition: all .2s;
+}
+.concert-bell:active { transform: scale(0.92); background: rgba(255,255,255,0.10); }
+
+.concert-title {
+  margin: 0 2px 4px;
+  font-size: 34px; font-weight: 800; letter-spacing: 0.02em;
+  color: #ffffff;
+  text-shadow:
+    0 2px 14px rgba(0,0,0,0.45),
+    0 0 30px rgba(167,139,250,0.25);
+}
+.concert-meta {
+  margin: 0 2px 28px;
   font-size: 13px; font-weight: 500;
-  color: rgba(255,255,255,0.32); margin-top: 4px; letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.62);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
 
-/* 大号时间舞台组件 */
-.fan-time-hero {
-  position: relative;
-  margin: 8px 0 34px;
-  padding: 34px 10px 38px;
-  text-align: center;
-  border-radius: var(--r-xl);
-  background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+/* 倒计时玻璃卡片 */
+.cd-card {
+  padding: 18px; border-radius: 22px;
+  background: rgba(255,255,255,0.055);
   border: 1px solid rgba(255,255,255,0.12);
-  backdrop-filter: blur(28px) saturate(160%);
-  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  backdrop-filter: blur(26px) saturate(160%);
+  -webkit-backdrop-filter: blur(26px) saturate(160%);
   box-shadow:
-    0 18px 50px rgba(0,0,0,0.42),
+    0 18px 46px rgba(0,0,0,0.38),
     inset 0 1px 0 rgba(255,255,255,0.12),
     0 0 0 1px rgba(167,139,250,0.06);
-  overflow: hidden;
+  overflow: hidden; position: relative;
 }
-.fan-time-hero::before {
+.cd-card::before {
   content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
   background: linear-gradient(150deg, rgba(255,255,255,0.22), rgba(167,139,250,0.18) 40%, transparent 65%, rgba(255,255,255,0.06));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
   pointer-events: none;
 }
-.fan-time-hero::after {
-  content: ''; position: absolute; top: -40%; left: -40%; width: 180%; height: 180%;
-  background: radial-gradient(circle at 50% 50%, rgba(196,181,253,0.14), transparent 55%);
-  animation: fanHeroBreathe 5s ease-in-out infinite;
-  pointer-events: none;
+.cd-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; position: relative; z-index: 1;
+  font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.68);
 }
-@keyframes fanHeroBreathe {
-  0%,100%{ opacity:.55; transform:scale(.96); }
-  50%{ opacity:1; transform:scale(1.04); }
+.cd-live {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 12px;
+  background: rgba(52,211,153,0.08);
+  border: 1px solid rgba(52,211,153,0.18);
+  color: #34d399; font-size: 11px; font-weight: 700;
 }
-.fan-time-num {
+.cd-live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px rgba(52,211,153,0.65);
+  animation: livePulse 1.8s ease-in-out infinite;
+}
+@keyframes livePulse { 0%,100%{opacity:.7; transform:scale(.9);} 50%{opacity:1; transform:scale(1.1);} }
+.cd-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
   position: relative; z-index: 1;
-  font-size: 86px; font-weight: 800; line-height: 1; letter-spacing: -0.04em;
-  color: #f8f7ff;
-  font-variant-numeric: tabular-nums;
-  text-shadow:
-    0 0 34px rgba(167,139,250,0.55),
-    0 0 72px rgba(139,92,246,0.28),
-    0 0 12px rgba(255,255,255,0.18);
 }
-.fan-time-glow {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-  width: 70%; height: 60%;
-  background: radial-gradient(ellipse at center, rgba(196,181,253,0.22), transparent 65%);
-  filter: blur(18px);
-  pointer-events: none;
+.cd-box {
+  padding: 12px 2px 10px; text-align: center; border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  backdrop-filter: blur(12px);
 }
-.fan-time-label {
-  position: relative; z-index: 1;
-  margin-top: 14px;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.22em;
-  color: rgba(196,181,253,0.75);
-  text-shadow: 0 0 14px rgba(139,92,246,0.35);
+.cd-num {
+  font-size: 30px; font-weight: 800; line-height: 1;
+  color: #ffffff; font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 18px rgba(196,181,253,0.45);
+}
+.cd-unit {
+  font-size: 10px; font-weight: 500;
+  color: rgba(255,255,255,0.48); margin-top: 6px;
+}
+.cd-hint {
+  margin-top: 12px; position: relative; z-index: 1;
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  display: flex; align-items: center; gap: 6px;
 }
 
-/* 分区标题 v2 */
-.fan-v2-section-title {
-  display: flex; align-items: center; gap: 12px;
-  margin: 0 2px 16px;
-}
-.fan-v2-title-text {
-  font-size: 14px; font-weight: 700;
-  color: rgba(255,255,255,0.85); letter-spacing: 0.04em;
-}
-.fan-v2-title-line {
-  flex: 1; height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.18), transparent);
-}
-
-/* 快捷工具网格 v2 */
-.fan-v2-grid {
-  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
-}
-.fan-v2-card {
-  position: relative;
-  padding: 20px 16px; border-radius: var(--r-xl);
-  background: rgba(255,255,255,0.045);
+/* 工作台信息卡 */
+.info-card {
+  margin-top: 14px; padding: 16px; border-radius: 20px;
+  background: rgba(255,255,255,0.05);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
-  box-shadow: 0 10px 36px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08);
-  transition: all .25s ease; cursor: pointer; overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08);
+  cursor: pointer; transition: all .2s;
+  position: relative; overflow: hidden;
 }
-.fan-v2-card::before {
+.info-card::before {
   content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.16), transparent 55%, rgba(167,139,250,0.10));
+  background: linear-gradient(135deg, rgba(255,255,255,0.16), transparent 60%, rgba(167,139,250,0.10));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
   pointer-events: none;
 }
-.fan-v2-card:active { transform: scale(0.96); }
-.fan-v2-card:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.16);
-  box-shadow: 0 14px 44px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.10), 0 0 28px rgba(167,139,250,0.08);
+.info-card:active { transform: scale(0.98); }
+.info-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px; font-size: 14px; font-weight: 700;
+  color: rgba(255,255,255,0.85);
 }
-.fan-v2-icon {
-  width: 48px; height: 48px; margin-bottom: 14px; border-radius: 16px;
-  display: flex; align-items: center; justify-content: center; font-size: 24px;
-  background: color-mix(in srgb, var(--glow) 18%, rgba(255,255,255,0.04));
-  border: 1px solid color-mix(in srgb, var(--glow) 25%, rgba(255,255,255,0.06));
-  box-shadow: 0 0 22px color-mix(in srgb, var(--glow) 35%, transparent), inset 0 1px 0 rgba(255,255,255,0.08);
+.info-icon { font-size: 16px; }
+.info-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
 }
-.fan-v2-name {
-  font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.95); margin-bottom: 3px;
+.info-item { text-align: center; }
+.info-val {
+  font-size: 17px; font-weight: 800;
+  color: #ffffff; line-height: 1;
+  text-shadow: 0 0 12px rgba(196,181,253,0.3);
 }
-.fan-v2-hint {
-  font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.38); letter-spacing: 0.04em;
+.info-label {
+  font-size: 10px; font-weight: 500;
+  color: rgba(255,255,255,0.40); margin-top: 5px;
 }
 
-/* 底部发光条 */
-.fan-v2-footer {
-  margin-top: auto;
-  padding-top: 34px;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
+/* 底部快捷入口 */
+.tool-row {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin-top: 14px;
 }
-.fan-v2-bar {
-  width: 48px; height: 4px; border-radius: 2px;
-  background: rgba(255,255,255,0.18);
-  box-shadow: 0 0 14px rgba(196,181,253,0.35);
+.tool-mini {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 14px 4px; border-radius: 18px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.09);
+  backdrop-filter: blur(16px);
+  font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  cursor: pointer; transition: all .2s;
 }
-.fan-v2-caption {
-  font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
-  color: rgba(255,255,255,0.22);
+.tool-mini:active { transform: scale(0.94); background: rgba(255,255,255,0.08); }
+.tool-mini span { font-size: 22px; }
+
+/* 宽屏微调 */
+@media (min-width: 600px) {
+  .concert-title { font-size: 42px; }
+  .cd-num { font-size: 36px; }
+  .info-val { font-size: 20px; }
 }
 
 /* 旧版兼容样式保留 */
