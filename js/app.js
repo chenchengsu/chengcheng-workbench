@@ -579,7 +579,7 @@ const HomeView = {
           <div class="hgc-value">¥${monthExpense < 1000 ? fmtMoney(monthExpense) : (monthExpense/1000).toFixed(1)+'k'}</div>
           <div class="hgc-label">本月支出</div>
         </div>
-        <div class="glass home-grid-card" onclick="App.navigate('health')">
+        <div class="glass home-grid-card" onclick="App.navigate('health','weight')">
           <div class="hgc-icon hgc-img"><img src="icon-weight.svg" alt=""></div>
           <div class="hgc-value">${latestWeight ? latestWeight.weight : '--'}<span class="unit">kg</span></div>
           <div class="hgc-label">当前体重</div>
@@ -1388,9 +1388,6 @@ const AccountView = {
 
     // （已移除：月度收支图表与年度对比）
 
-    // Filter bar + Transactions (wrapped for partial re-render)
-    html += `<div id="filterTxSection">${this._filterTxHTML()}</div>`;
-
     view.innerHTML = html;
     this._scrollMonth();
     // 收支日历
@@ -1399,89 +1396,6 @@ const AccountView = {
     CalNav.init('account', this.calYear, this.calMonth, this.calSel);
     this.renderCal();
     this.renderDay();
-  },
-  _filterTxHTML() {
-    const pool = this._poolEntries();
-    let filtered = pool.filter(e => this._matchFilterType(e, this.filterType));
-    if (this.filterCat !== 'all') filtered = filtered.filter(e => e.category === this.filterCat);
-    filtered.sort((a,b) => b.date.localeCompare(a.date));
-
-    const allCats = [...new Set(pool.map(e => e.category))];
-    const allYears = [...new Set(Store.getAccounts().map(e => yearKey(e.date)))].sort();
-
-    let html = `<div class="glass"><div class="section-title" style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">💰 收支明细 (${filtered.length}笔)<button class="filter-reset-btn" onclick="AccountView.resetFilter()" title="刷新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg><span>刷新</span></button></div>`;
-    // Filter bar
-    html += `<div class="filter-bar">
-      <div class="filter-row">
-        <div class="filter-label">年份</div>
-        <div class="filter-chips filter-chips-scroll">
-          <div class="filter-chip ${this.filterYear==='all'?'active':''}" onclick="AccountView.selFilterYear('all')">全部</div>
-          ${allYears.map(y => `<div class="filter-chip ${String(this.filterYear)===y?'active':''}" onclick="AccountView.selFilterYear('${y}')">${y}</div>`).join('')}
-        </div>
-      </div>
-      <div class="filter-row">
-        <div class="filter-label">月份</div>
-        <div class="filter-chips filter-chips-scroll">
-          <div class="filter-chip ${this.filterMonth==='all'?'active':''}" onclick="AccountView.selFilterMonth('all')">全部</div>
-          ${MONTH_NAMES.map((m,i) => `<div class="filter-chip ${this.filterMonth===(i+1)?'active':''}" onclick="AccountView.selFilterMonth(${i+1})">${m}</div>`).join('')}
-        </div>
-      </div>
-      <div class="filter-row">
-        <div class="filter-label">类型</div>
-        <div class="filter-chips">
-          <div class="filter-chip ${this.filterType==='all'?'active':''}" onclick="AccountView.selFilterType('all')">全部</div>
-          <div class="filter-chip ${this.filterType==='income'?'active':''}" onclick="AccountView.selFilterType('income')">收入</div>
-          <div class="filter-chip ${this.filterType==='expense'?'active':''}" onclick="AccountView.selFilterType('expense')">支出</div>
-          <div class="filter-chip ${this.filterType==='refund'?'active':''}" onclick="AccountView.selFilterType('refund')">退款</div>
-          <div class="filter-chip ${this.filterType==='reimburse'?'active':''}" onclick="AccountView.selFilterType('reimburse')">报销</div>
-          <div class="filter-chip ${this.filterType==='transfer'?'active':''}" onclick="AccountView.selFilterType('transfer')">转账</div>
-        </div>
-      </div>
-      <div class="filter-row">
-        <div class="filter-label">分类</div>
-        <div class="filter-chips filter-chips-scroll">
-          <div class="filter-chip ${this.filterCat==='all'?'active':''}" onclick="AccountView.selFilterCat('all')">全部</div>
-          ${allCats.map(c => `<div class="filter-chip ${this.filterCat===c?'active':''}" onclick="AccountView.selFilterCat('${c}')">${c}</div>`).join('')}
-        </div>
-      </div>
-    </div>`;
-    html += `<div class="transaction-list">`;
-    if (filtered.length === 0) {
-      html += '<div class="empty-state" style="padding:32px"><div class="empty-state-icon">💸</div>暂无符合条件的记录</div>';
-    } else {
-      filtered.forEach(e => {
-        const icon = CONFIG.categoryIcons[e.category] || '📌';
-        const color = CONFIG.categoryColors[e.category] || '#95a5a6';
-        const refunded = this._refundedTotal(e);
-        const netTag = (e.type === 'expense' && refunded > 0)
-          ? `<span class="tx-refund-tag">已退 ${fmtMoney(refunded)}</span>` : '';
-        const reimTag = (e.type === 'expense' && e.reimbursable) ? this._reimStatusTag(e) : '';
-        const flowTag = e.refundId ? `<span class="tx-flow-tag refund">退款到账</span>`
-          : e.reimbursementId ? `<span class="tx-flow-tag reimburse">报销到账</span>` : '';
-        html += `<div class="transaction-item" onclick="AccountView.openExpenseDetail('${e.id}')">
-          <div class="transaction-icon" style="background:${color}22">${icon}</div>
-          <div class="transaction-info">
-            <div class="transaction-category">${e.category} ${netTag}${reimTag}${flowTag}</div>
-            <div class="transaction-note">${e.note||'无备注'}</div>
-            <div class="transaction-meta">${e.date} · ${e.account}</div>
-          </div>
-          ${this._txAmtHTML(e)}
-          <div class="transaction-actions" onclick="event.stopPropagation()">
-            ${e.type === 'expense' ? `<button class="btn-icon btn-icon-refund" title="退款" onclick="AccountView.openRefundForm('${e.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button>` : ''}
-            <button class="btn-icon" title="编辑" onclick="AccountView.openEdit('${e.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <button class="btn-icon" title="删除" onclick="AccountView.del('${e.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button>
-          </div>
-        </div>`;
-      });
-    }
-    html += '</div></div>';
-    return html;
-  },
-  _renderFilterTx() {
-    const sec = $('#filterTxSection');
-    if (sec) sec.innerHTML = this._filterTxHTML();
-    const sum = $('#accountSummary');
-    if (sum) sum.outerHTML = this._summaryHTML(this._getFilteredEntries());
   },
   _scrollMonth() {
     const bar = $('.month-pills');
@@ -1547,17 +1461,6 @@ const AccountView = {
   prevMonth() { this.curMonth--; if (this.curMonth < 0) { this.curMonth = 11; this.curYear--; } this.filterYear = this.curYear; this.filterMonth = this.curMonth + 1; this.render(); },
   nextMonth() { this.curMonth++; if (this.curMonth > 11) { this.curMonth = 0; this.curYear++; } this.filterYear = this.curYear; this.filterMonth = this.curMonth + 1; this.render(); },
   selAcc(a) { this.selAccount = a; this.filterCat = 'all'; this.render(); },
-  selFilterType(t) { this.filterType = t; this.filterCat = 'all'; this._renderFilterTx(); },
-  selFilterYear(y) { this.filterYear = y; this._renderFilterTx(); },
-  selFilterMonth(m) { this.filterMonth = m; this._renderFilterTx(); },
-  selFilterCat(c) {
-    this.filterCat = c;
-    if (CONFIG.incomeCategories.includes(c) && !CONFIG.expenseCategories.includes(c)) this.filterType = 'income';
-    else if (CONFIG.expenseCategories.includes(c) && !CONFIG.incomeCategories.includes(c)) this.filterType = 'expense';
-    else this.filterType = 'all';
-    this._renderFilterTx();
-  },
-  resetFilter() { this.filterType = 'all'; this.filterCat = 'all'; this.filterYear = this.curYear; this.filterMonth = this.curMonth + 1; this._renderFilterTx(); },
   clearAllData() {
     ConfirmDialog.show('⚠️ 确认清除全部数据？（包括记账记录、体重记录、经期记录、自定义账户和分类，此操作不可恢复。）', () => {
       Store.clearAllData();
