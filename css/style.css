@@ -392,7 +392,7 @@ ul, ol { list-style: none; }
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: none;
@@ -405,7 +405,7 @@ ul, ol { list-style: none; }
   animation: fadeIn 0.25s ease;
 }
 .modal {
-  background: rgba(20, 20, 30, 0.85);
+  background: rgba(18, 18, 28, 0.97);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
@@ -3976,7 +3976,7 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   -webkit-backdrop-filter: none !important;
 }
 /* 磨砂关闭后，弹窗/Toast 补回实底以保证可读性 */
-.modal { background: rgba(16, 16, 26, 0.96); }
+.modal { background: rgba(18, 18, 28, 0.97); }
 .toast { background: rgba(16, 16, 26, 0.96); }
 .confirm-dialog { background: transparent; }
 
