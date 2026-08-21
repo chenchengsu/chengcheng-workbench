@@ -1,4 +1,4 @@
-const CACHE = 'chengcheng-workbench-v95';
+const CACHE = 'chengcheng-workbench-v96';
 const ASSETS = [
   './',
   './index.html',
@@ -19,6 +19,7 @@ const ASSETS = [
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './stage-hero.png',
   './nav-home.png',
   './nav-account.png',
   './nav-health.png',
