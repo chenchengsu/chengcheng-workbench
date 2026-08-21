@@ -135,8 +135,8 @@ function ringSVG(percent, size = 100, stroke = 7) {
     <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
       <defs>
         <linearGradient id="${gid}" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#ff3d7f"/>
-          <stop offset="100%" stop-color="#ff6ba0"/>
+          <stop offset="0%" stop-color="#a78bfa"/>
+          <stop offset="100%" stop-color="#c9b8ff"/>
         </linearGradient>
         <filter id="glow_${gid}">
           <feGaussianBlur stdDeviation="2" result="blur"/>
@@ -800,9 +800,9 @@ const HealthView = {
         labels: ws.map(w => w.date.slice(5)),
         datasets: [{
           label: '体重 (kg)', data: ws.map(w => w.weight),
-          borderColor: '#ff3d7f', backgroundColor: 'rgba(255,61,127,0.08)',
+          borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,0.08)',
           fill: true, tension: 0.35, borderWidth: 2,
-          pointBackgroundColor: '#ff3d7f', pointRadius: 3, pointHoverRadius: 6
+          pointBackgroundColor: '#a78bfa', pointRadius: 3, pointHoverRadius: 6
         }]
       },
       options: { ...opts, plugins: { ...opts.plugins, legend: { display: false } }, scales: { ...opts.scales, y: { ...opts.scales.y, ticks: { ...opts.scales.y.ticks, callback: (v) => Number(v).toFixed(2) } } } }
