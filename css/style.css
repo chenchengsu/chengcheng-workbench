@@ -3970,3 +3970,13 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   .modal { width: 100%; }
 }
 
+/* ===== v127: 全局磨砂归零（所有毛玻璃模糊效果关闭） ===== */
+*, *::before, *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+/* 磨砂关闭后，弹窗/Toast 补回实底以保证可读性 */
+.modal { background: rgba(16, 16, 26, 0.96); }
+.toast { background: rgba(16, 16, 26, 0.96); }
+.confirm-dialog { background: transparent; }
+
