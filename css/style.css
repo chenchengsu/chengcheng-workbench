@@ -3155,7 +3155,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 
 /* ===== 应援工作台首页 ===== */
 
-/* 舞台背景：仅在首页显示 */
+/* 舞台背景：所有板块常驻显示 */
 .stage-hero-bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image: url('../stage-hero.png');
@@ -3522,10 +3522,10 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .tag-row { display:flex; gap:8px; flex-wrap:wrap; }
 
 /* ========================================
-   记账板块：与底部导航 Dock 风格统一
+   全部板块（记账/健康/记事本/拼豆）：与底部导航 Dock 风格统一
    透明玻璃 + blur(28px) saturate(160%) + 细白边 + 胶囊圆角
    ======================================== */
-#view-account .glass {
+.view:not(#view-home) .glass {
   background: rgba(8, 8, 16, 0);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -3533,10 +3533,10 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border-radius: 24px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
 }
-#view-account .glass::before {
+.view:not(#view-home) .glass::before {
   background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent 50%, rgba(167,139,250,0.10));
 }
-#view-account .btn-glass {
+.view:not(#view-home) .btn-glass {
   background: rgba(8, 8, 16, 0);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -3544,10 +3544,10 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border-radius: 999px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }
-#view-account .btn-glass:hover { background: rgba(255,255,255,0.06); }
-#view-account .btn-glass svg,
-#view-account .btn-primary svg { width: 14px; height: 14px; }
-#view-account .btn-primary {
+.view:not(#view-home) .btn-glass:hover { background: rgba(255,255,255,0.06); }
+.view:not(#view-home) .btn-glass svg,
+.view:not(#view-home) .btn-primary svg { width: 14px; height: 14px; }
+.view:not(#view-home) .btn-primary {
   background: rgba(8, 8, 16, 0);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -3556,20 +3556,20 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 14px rgba(167,139,250,0.30);
 }
-#view-account .btn-primary:hover {
+.view:not(#view-home) .btn-primary:hover {
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 0 20px rgba(167,139,250,0.45);
   transform: none;
 }
-#view-account .btn-icon,
-#view-account .month-arrow {
+.view:not(#view-home) .btn-icon,
+.view:not(#view-home) .month-arrow {
   background: rgba(8, 8, 16, 0);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 999px;
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
 }
-#view-account .year-tabs,
-#view-account .month-pills {
+.view:not(#view-home) .year-tabs,
+.view:not(#view-home) .month-pills {
   background: rgba(8, 8, 16, 0);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
@@ -3577,22 +3577,49 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border-radius: 24px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
 }
-#view-account .year-tab.active,
-#view-account .month-pill.active {
+.view:not(#view-home) .year-tab.active,
+.view:not(#view-home) .month-pill.active {
   background: rgba(255,255,255,0.12);
   color: #fff;
   box-shadow: 0 0 10px rgba(167,139,250,0.35), inset 0 1px 0 rgba(255,255,255,0.10);
 }
-#view-account .account-chip {
+.view:not(#view-home) .account-chip {
   background: rgba(8, 8, 16, 0);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 999px;
 }
-#view-account .account-chip.active {
+.view:not(#view-home) .account-chip.active {
   background: rgba(255,255,255,0.12);
   color: #fff;
   border-color: rgba(255,255,255,0.18);
   box-shadow: 0 0 10px rgba(167,139,250,0.35);
+}
+
+/* 健康/记事本/拼豆 的 tab 切换条与图标按钮同样 Dock 化 */
+.view:not(#view-home) .tab-bar {
+  background: rgba(8, 8, 16, 0);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.view:not(#view-home) .tab-item.active {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 10px rgba(167,139,250,0.35), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+.view:not(#view-home) .icon-btn {
+  border-radius: 999px;
+  opacity: 1;
+}
+.view:not(#view-home) .empty-state {
+  background: rgba(8, 8, 16, 0);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px dashed rgba(255,255,255,0.14);
+  border-radius: 24px;
 }
