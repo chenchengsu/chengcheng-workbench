@@ -3980,3 +3980,29 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 .toast { background: rgba(16, 16, 26, 0.96); }
 .confirm-dialog { background: transparent; }
 
+/* ===== v128: 磨砂关闭后为玻璃元素补一点底色 ===== */
+/* 大容器（卡片 / Dock / 导航 / 悬浮按钮 / 列表项）：深色薄底 */
+.glass,
+.view:not(#view-home) .glass,
+.view:not(#view-home) .history-item,
+.view:not(#view-home) .nb-item,
+.view:not(#view-home) .nb-todo-item,
+.view:not(#view-home) .bead-log-item,
+.view:not(#view-home) .bead-low-item,
+#view-account .account-balance-item,
+#view-account .btn-add-account,
+.bottom-nav,
+.fab-export,
+.empty-state,
+.tab-bar {
+  background: rgba(10, 10, 20, 0.38);
+}
+/* 小控件（输入框 / 各类 chip / 小按钮）：浅色薄底，叠在卡片上区分层次 */
+.form-input, .form-select, .form-textarea,
+.filter-chip, .fam-chip, .category-chip, .type-btn,
+.account-field-chip, .period-tab, .icon-btn, .btn-glass,
+.bead-step, .bead-edit, .bead-adj-cancel, .nb-todo-add-row,
+.bead-adj-pop, .import-stat {
+  background: rgba(255, 255, 255, 0.06);
+}
+
