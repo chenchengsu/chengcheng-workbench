@@ -540,14 +540,6 @@ const HomeView = {
   render() {
     if (this._clockTimer) { clearInterval(this._clockTimer); this._clockTimer = null; }
 
-    const today = todayStr();
-    const todayExpense = Store.getAccounts().filter(e => e.date === today && e.type === 'expense')
-      .reduce((s, e) => s + parseFloat(e.amount || 0), 0).toFixed(2);
-    const monthExpense = Store.getAccounts().filter(e => monthKey(e.date) === monthKey(today) && e.type === 'expense')
-      .reduce((s, e) => s + parseFloat(e.amount || 0), 0).toFixed(2);
-    const ws = Store.getWeights().sort((a, b) => a.date.localeCompare(b.date));
-    const latestWeight = ws.length ? parseFloat(ws[ws.length - 1].weight).toFixed(2) : '--';
-
     let html = `
     <div class="fan-home v3">
       <div class="live-clock">
@@ -555,26 +547,9 @@ const HomeView = {
         <div class="live-clock-date" id="liveClockDate"></div>
       </div>
 
-      <div class="info-card" onclick="App.navigate('account')">
-        <div class="info-header"><span class="info-icon">✨</span> 今日工作台</div>
-        <div class="info-grid">
-          <div class="info-item"><div class="info-val">${todayExpense}</div><div class="info-label">今日支出</div></div>
-          <div class="info-item"><div class="info-val">${monthExpense}</div><div class="info-label">本月支出</div></div>
-          <div class="info-item"><div class="info-val">${latestWeight}</div><div class="info-label">当前体重</div></div>
-          <div class="info-item" style="cursor:pointer" onclick="event.stopPropagation();CloudBackup.open()">
-            <div class="info-val">☁️</div><div class="info-label">导出 / 导入</div>
-          </div>
-        </div>
+      <div class="fab-export" onclick="CloudBackup.open()" title="导出 / 导入">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
       </div>
-
-      <div class="tool-row">
-        <div class="tool-mini" onclick="App.navigate('account')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>记账</div>
-        <div class="tool-mini" onclick="App.navigate('health','weight')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>健康</div>
-        <div class="tool-mini" onclick="App.navigate('notebook')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>记事</div>
-        <div class="tool-mini" onclick="App.navigate('bead')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>拼豆</div>
-      </div>
-
-      <div style="height:28px"></div>
     </div>
     `;
 
