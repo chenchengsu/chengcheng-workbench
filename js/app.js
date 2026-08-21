@@ -535,13 +535,9 @@ const ChartMgr = {
    首页仪表盘
    ============================================ */
 const HomeView = {
-  _cdTimer: null,
   _clockTimer: null,
-  // 下一场演唱会时间（可自行修改）
-  _targetDate: new Date('2026-09-15T19:30:00+08:00'),
 
   render() {
-    if (this._cdTimer) { clearInterval(this._cdTimer); this._cdTimer = null; }
     if (this._clockTimer) { clearInterval(this._clockTimer); this._clockTimer = null; }
 
     const today = todayStr();
@@ -556,25 +552,13 @@ const HomeView = {
     let html = `
     <div class="fan-home v3">
       <div class="concert-top">
-        <div class="concert-tagline">CONCERT · SHANGHAI 2026</div>
         <div class="concert-bell" onclick="App.navigate('notebook')">🛎️</div>
       </div>
 
-      <div class="concert-title">未·LIVE 上海站</div>
-      <div class="concert-meta">上海体育场 · 9月15日 19:30</div>
-
-      <div class="cd-card">
-        <div class="cd-header">
-          <span>距开场还有</span>
-          <span class="cd-live"><i class="cd-live-dot"></i>实时同步</span>
-        </div>
-        <div class="cd-grid">
-          <div class="cd-box"><div class="cd-num" id="cdDays">00</div><div class="cd-unit">天</div></div>
-          <div class="cd-box"><div class="cd-num" id="cdHours">00</div><div class="cd-unit">小时</div></div>
-          <div class="cd-box"><div class="cd-num" id="cdMinutes">00</div><div class="cd-unit">分钟</div></div>
-          <div class="cd-box"><div class="cd-num" id="cdSeconds">00</div><div class="cd-unit">秒</div></div>
-        </div>
-        <div class="cd-hint"><span>🎫</span> 内场看台 · 建议 17:30 前到场完成安检</div>
+      <div class="live-clock">
+        <div class="live-clock-time" id="liveClockTime">00:00:00</div>
+        <div class="live-clock-date" id="liveClockDate"></div>
+        <div class="live-clock-live"><i class="cd-live-dot"></i>实时</div>
       </div>
 
       <div class="info-card" onclick="App.navigate('account')">
@@ -599,24 +583,21 @@ const HomeView = {
     `;
 
     $('#view-home').innerHTML = html;
-    this._startCountdown();
+    this._startClock();
   },
 
-  _startCountdown() {
+  _startClock() {
+    const daysCN = ['周日','周一','周二','周三','周四','周五','周六'];
+    const pad = n => String(n).padStart(2, '0');
     const update = () => {
-      const diff = this._targetDate.getTime() - Date.now();
-      const days = Math.max(0, Math.floor(diff / 86400000));
-      const hours = Math.max(0, Math.floor((diff % 86400000) / 3600000));
-      const minutes = Math.max(0, Math.floor((diff % 3600000) / 60000));
-      const seconds = Math.max(0, Math.floor((diff % 60000) / 1000));
-      const d = $('#cdDays'), h = $('#cdHours'), m = $('#cdMinutes'), s = $('#cdSeconds');
-      if (d) d.textContent = String(days).padStart(2, '0');
-      if (h) h.textContent = String(hours).padStart(2, '0');
-      if (m) m.textContent = String(minutes).padStart(2, '0');
-      if (s) s.textContent = String(seconds).padStart(2, '0');
+      const now = new Date();
+      const tEl = $('#liveClockTime');
+      if (tEl) tEl.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const dEl = $('#liveClockDate');
+      if (dEl) dEl.textContent = `${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} · ${daysCN[now.getDay()]}`;
     };
     update();
-    this._cdTimer = setInterval(update, 1000);
+    this._clockTimer = setInterval(update, 1000);
   },
 
   _periodCardHTML(periodInfo, periods, today) {
