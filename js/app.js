@@ -759,13 +759,13 @@ const HealthView = {
 
     // Chart
     html += `<div class="glass chart-card">
-      <div class="dash-card-header"><div class="dash-card-title">📈 体重趋势</div>
+      <div class="dash-card-header"><div class="dash-card-title"><svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>体重趋势</div>
         <button class="btn btn-primary btn-sm" onclick="HealthView.openWeightAdd()">+ 记录</button></div>
       <div class="chart-wrapper"><canvas id="weightChart"></canvas></div>
     </div>`;
 
     // History
-    html += `<div class="glass"><div class="section-title" style="padding:18px 18px 0">📝 历史记录</div><div class="history-list">`;
+    html += `<div class="glass"><div class="section-title" style="padding:18px 18px 0"><svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> 历史记录</div><div class="history-list">`;
     if (ws.length === 0) {
       html += '<div class="empty-state">暂无记录</div>';
     } else {
@@ -892,9 +892,9 @@ const HealthView = {
     html += `<div style="text-align:right;margin-bottom:14px"><button class="btn btn-primary btn-sm" onclick="HealthView.openPeriodAdd()">+ 记录经期</button></div>`;
 
     // History
-    html += `<div class="glass"><div class="section-title" style="padding:18px 18px 0">🌸 经期记录</div><div class="history-list">`;
+    html += `<div class="glass"><div class="section-title" style="padding:18px 18px 0"><svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> 经期记录</div><div class="history-list">`;
     if (periods.length === 0) {
-      html += '<div class="empty-state"><div class="empty-state-icon">🌸</div>暂无经期记录</div>';
+      html += '<div class="empty-state"><div class="empty-state-icon"><svg style="width:30px;height:30px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>暂无经期记录</div>';
     } else {
       periods.forEach((p, i) => {
         const startD = parseDate(p.startDate);
@@ -2666,9 +2666,9 @@ const NotebookView = {
 
     // 笔记区
     html += `<div class="nb-section">
-      <div class="nb-section-title">📝 笔记</div>`;
+      <div class="nb-section-title"><svg style="width:14px;height:14px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> 笔记</div>`;
     if (notes.length === 0) {
-      html += '<div class="empty-state"><div class="empty-state-icon">📝</div>当天暂无笔记</div>';
+      html += '<div class="empty-state"><div class="empty-state-icon"><svg style="width:30px;height:30px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>当天暂无笔记</div>';
     } else {
       html += '<div class="nb-list">';
       notes.forEach(n => {
@@ -2684,12 +2684,12 @@ const NotebookView = {
 
     // 待办区
     html += `<div class="nb-section">
-      <div class="nb-section-title">✅ 待办</div>`;
+      <div class="nb-section-title"><svg style="width:14px;height:14px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 待办</div>`;
     if (todos.length === 0 && !notes.length) {
       // already showed empty for notes, show empty for todos too if both empty
     }
     if (todos.length === 0) {
-      html += '<div class="empty-state"><div class="empty-state-icon">✅</div>当天暂无待办</div>';
+      html += '<div class="empty-state"><div class="empty-state-icon"><svg style="width:30px;height:30px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>当天暂无待办</div>';
     } else {
       html += '<div class="nb-list">';
       todos.forEach(t => {
@@ -2806,7 +2806,7 @@ const BeadView = {
       </div>
 
       <div class="bead-threshold glass" onclick="BeadView.editThreshold()">
-        ⚠️ 低库存阈值 <b id="ovThreshold">${threshold}</b> 颗（点击修改）
+        <svg style="width:15px;height:15px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> 低库存阈值 <b id="ovThreshold">${threshold}</b> 颗（点击修改）
       </div>
 
       <div class="bead-family-grid">
@@ -2814,14 +2814,14 @@ const BeadView = {
       </div>
 
       <div class="bead-actionbar">
-        <button class="btn btn-glass" onclick="BeadView.openImport()">📥 导入</button>
-        <button class="btn btn-glass" onclick="BeadView.openExport()">📤 导出</button>
+        <button class="btn btn-glass" onclick="BeadView.openImport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 导入</button>
+        <button class="btn btn-glass" onclick="BeadView.openExport()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> 导出</button>
         <button class="btn btn-primary" onclick="BeadView.openAdd()">＋ 新增</button>
       </div>
 
       <div class="glass bead-log-card">
         <div class="bead-log-head">
-          <span class="bead-log-title">📝 修改记录</span>
+          <span class="bead-log-title"><svg style="width:14px;height:14px;vertical-align:-2px;margin-right:4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><polyline points="12 7 12 12 15 15"/></svg>修改记录</span>
           <button class="bead-log-clear" onclick="BeadView.clearLogs()">清空</button>
         </div>
         <div class="bead-log-list" id="beadLogList"></div>
@@ -2844,7 +2844,14 @@ const BeadView = {
     if (!el) return;
     const logs = Store.getBeadLogs();
     if (logs.length === 0) { el.innerHTML = '<div class="bead-log-empty">暂无修改记录</div>'; return; }
-    const icon = { adjust: '📦', edit: '✎', add: '➕', threshold: '⚙️', import: '📥' };
+    const _li = (p) => `<svg style="width:15px;height:15px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+    const icon = {
+      adjust: _li('<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'),
+      edit: _li('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'),
+      add: _li('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>'),
+      threshold: _li('<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>'),
+      import: _li('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>')
+    };
     el.innerHTML = logs.slice(0, 20).map(l => {
       const d = new Date(l.time);
       const ts = `${d.getMonth() + 1}.${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
