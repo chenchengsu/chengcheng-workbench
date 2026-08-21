@@ -4006,3 +4006,10 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   background: rgba(255, 255, 255, 0.12);
 }
 
+
+/* ===== v131: 拼豆加减输入框数字底色改纯白 ===== */
+.bead-adj-pop .bead-adj-input {
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
