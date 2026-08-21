@@ -551,10 +551,6 @@ const HomeView = {
 
     let html = `
     <div class="fan-home v3">
-      <div class="concert-top">
-        <div class="concert-bell" onclick="App.navigate('notebook')">🛎️</div>
-      </div>
-
       <div class="live-clock">
         <div class="live-clock-time" id="liveClockTime">00:00:00</div>
         <div class="live-clock-date" id="liveClockDate"></div>
