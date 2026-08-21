@@ -535,77 +535,168 @@ const ChartMgr = {
    首页仪表盘
    ============================================ */
 const HomeView = {
+  _cdTimer: null,
+  _clockTimer: null,
+  // 下一场演唱会时间（可自行修改）
+  _targetDate: new Date('2026-09-15T19:30:00+08:00'),
+
   render() {
+    if (this._cdTimer) { clearInterval(this._cdTimer); this._cdTimer = null; }
+    if (this._clockTimer) { clearInterval(this._clockTimer); this._clockTimer = null; }
+
     const today = todayStr();
     const now = new Date();
-    const expenses = Store.getAccounts().filter(e => e.date === today);
-    const weights = Store.getWeights().sort((a,b) => a.date.localeCompare(b.date));
-    const latestWeight = weights[weights.length - 1];
-
-    const todayExpense = expenses.filter(e => e.type === 'expense').reduce((s,e) => s + parseFloat(e.amount), 0);
-    const monthExpense = Store.getAccounts().filter(e => monthKey(e.date) === monthKey(today) && e.type === 'expense').reduce((s,e) => s + parseFloat(e.amount), 0);
-    const monthIncome = Store.getAccounts().filter(e => monthKey(e.date) === monthKey(today) && e.type === 'income').reduce((s,e) => s + parseFloat(e.amount), 0);
-
-    // 经期状态
-    const periods = Store.getPeriods().sort((a,b) => a.startDate.localeCompare(b.startDate));
-    const periodInfo = this._getPeriodInfo(periods, today);
+    const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} · ${days[now.getDay()]}`;
 
     let html = `
-      <div class="home-topbar">
-        <div class="home-topbar-left">
-          <div class="home-greeting">${now.getHours() < 12 ? '早上好' : now.getHours() < 18 ? '下午好' : '晚上好'}，今天也要加油</div>
-          <div class="home-name">程呈</div>
+    <div class="fan-home">
+      <div class="fan-statusbar">
+        <div class="fan-status-left">
+          <span class="fan-status-dot"></span>
+          <span class="fan-status-city">上海</span>
         </div>
-        <div class="home-topbar-date">
-          <button class="home-cloud-btn" onclick="CloudBackup.open()" title="云端备份">☁️</button>
-          <span class="home-date-day">${now.getMonth()+1}.${now.getDate()}</span>
-          <span class="home-date-dot">·</span>
-          <span class="home-date-week">${getWeekday(today)}</span>
-        </div>
-      </div>
-
-      <!-- 经期沙漏 + 日历 -->
-      ${this._periodCardHTML(periodInfo, periods, today)}
-
-      <!-- 6大板块 3x2 网格 -->
-      <div class="home-grid">
-        <div class="glass home-grid-card" onclick="App.navigate('account')">
-          <div class="hgc-icon hgc-img"><img src="icon-expense-today.svg" alt=""></div>
-          <div class="hgc-value">¥${todayExpense < 1000 ? fmtMoney(todayExpense) : (todayExpense/1000).toFixed(1)+'k'}</div>
-          <div class="hgc-label">今日支出</div>
-        </div>
-        <div class="glass home-grid-card" onclick="App.navigate('account')">
-          <div class="hgc-icon hgc-img"><img src="icon-expense-month.svg" alt=""></div>
-          <div class="hgc-value">¥${monthExpense < 1000 ? fmtMoney(monthExpense) : (monthExpense/1000).toFixed(1)+'k'}</div>
-          <div class="hgc-label">本月支出</div>
-        </div>
-        <div class="glass home-grid-card" onclick="App.navigate('health','weight')">
-          <div class="hgc-icon hgc-img"><img src="icon-weight.svg" alt=""></div>
-          <div class="hgc-value">${latestWeight ? latestWeight.weight : '--'}<span class="unit">kg</span></div>
-          <div class="hgc-label">当前体重</div>
-        </div>
-        <div class="glass home-grid-card" onclick="App.navigate('health','period')">
-          <div class="hgc-icon hgc-img"><img src="icon-period.svg" alt=""></div>
-          <div class="hgc-value">${periodInfo.quickNum}<span class="unit">${periodInfo.quickUnit}</span></div>
-          <div class="hgc-label">经期记录</div>
-        </div>
-        <div class="glass home-grid-card" onclick="App.navigate('notebook')">
-          <div class="hgc-icon hgc-img"><img src="icon-notebook.svg" alt=""></div>
-          <div class="hgc-value">&nbsp;</div>
-          <div class="hgc-label">记事本</div>
-        </div>
-        <div class="glass home-grid-card" onclick="App.navigate('bead')">
-          <div class="hgc-icon hgc-img"><img src="icon-bead.svg" alt=""></div>
-          <div class="hgc-value">&nbsp;</div>
-          <div class="hgc-label">拼豆</div>
+        <div class="fan-status-time" id="fanStatusTime">${timeStr}</div>
+        <div class="fan-status-right">
+          <span class="fan-status-signal"><i></i><i></i><i></i><i></i></span>
+          <span class="fan-status-battery">100%</span>
         </div>
       </div>
 
+      <div class="fan-hero">
+        <div class="fan-hero-label">距下一场演唱会还有</div>
+        <div class="fan-countdown" id="fanCountdown">
+          <div class="fan-cd-col"><span class="fan-cd-num" id="cdDays">00</span><span class="fan-cd-unit">天</span></div>
+          <div class="fan-cd-sep">:</div>
+          <div class="fan-cd-col"><span class="fan-cd-num" id="cdHours">00</span><span class="fan-cd-unit">时</span></div>
+          <div class="fan-cd-sep">:</div>
+          <div class="fan-cd-col"><span class="fan-cd-num" id="cdMinutes">00</span><span class="fan-cd-unit">分</span></div>
+        </div>
+        <div class="fan-hero-meta">
+          <span class="fan-hero-tag">2026.09.15 · 上海体育场</span>
+          <span class="fan-hero-tag silver">STAGE LIGHTS</span>
+        </div>
+      </div>
+
+      <div class="fan-section-title">
+        <span class="fan-title-text">快捷工具</span>
+        <span class="fan-title-line"></span>
+      </div>
+
+      <div class="fan-tools-grid">
+        <div class="glass fan-tool-card" onclick="App.navigate('account')">
+          <div class="fan-tool-icon" style="--tint:#60a5fa">💰</div>
+          <div class="fan-tool-name">记账</div>
+          <div class="fan-tool-desc">收支明细</div>
+        </div>
+        <div class="glass fan-tool-card" onclick="App.navigate('health','weight')">
+          <div class="fan-tool-icon" style="--tint:#34d399">⚖️</div>
+          <div class="fan-tool-name">健康</div>
+          <div class="fan-tool-desc">体重 / 经期</div>
+        </div>
+        <div class="glass fan-tool-card" onclick="App.navigate('notebook')">
+          <div class="fan-tool-icon" style="--tint:#fbbf24">📝</div>
+          <div class="fan-tool-name">记事本</div>
+          <div class="fan-tool-desc">灵感记录</div>
+        </div>
+        <div class="glass fan-tool-card" onclick="App.navigate('bead')">
+          <div class="fan-tool-icon" style="--tint:#f472b6">🎨</div>
+          <div class="fan-tool-name">拼豆</div>
+          <div class="fan-tool-desc">色号库存</div>
+        </div>
+      </div>
+
+      <div class="fan-section-title">
+        <span class="fan-title-text">今日行程</span>
+        <span class="fan-title-line"></span>
+      </div>
+
+      <div class="glass fan-card fan-schedule">
+        <div class="fan-schedule-item">
+          <div class="fan-schedule-dot"></div>
+          <div class="fan-schedule-info">
+            <div class="fan-schedule-time">19:30</div>
+            <div class="fan-schedule-name">演唱会 · 上海站</div>
+            <div class="fan-schedule-loc">上海体育场 · 内场 A1 区</div>
+          </div>
+          <div class="fan-schedule-status">已出票</div>
+        </div>
+        <div class="fan-schedule-item">
+          <div class="fan-schedule-dot dim"></div>
+          <div class="fan-schedule-info">
+            <div class="fan-schedule-time">17:00</div>
+            <div class="fan-schedule-name">应援物领取</div>
+            <div class="fan-schedule-loc">场馆西门 · 官方摊位</div>
+          </div>
+          <div class="fan-schedule-status soon">进行中</div>
+        </div>
+      </div>
+
+      <div class="fan-section-title">
+        <span class="fan-title-text">应援任务</span>
+        <span class="fan-title-line"></span>
+      </div>
+
+      <div class="glass fan-card fan-tasks">
+        <label class="fan-task">
+          <input type="checkbox" checked>
+          <span class="fan-task-check"></span>
+          <span class="fan-task-text done">确认电子票 & 身份证</span>
+        </label>
+        <label class="fan-task">
+          <input type="checkbox" checked>
+          <span class="fan-task-check"></span>
+          <span class="fan-task-text done">充电宝 & 润喉糖</span>
+        </label>
+        <label class="fan-task">
+          <input type="checkbox">
+          <span class="fan-task-check"></span>
+          <span class="fan-task-text">背歌词 · 银海应援</span>
+        </label>
+        <label class="fan-task">
+          <input type="checkbox">
+          <span class="fan-task-check"></span>
+          <span class="fan-task-text">预约拼车返程</span>
+        </label>
+      </div>
+
+      <div class="fan-date-card">
+        <span>${dateStr}</span>
+      </div>
+
+      <div style="height:40px"></div>
+    </div>
     `;
 
     $('#view-home').innerHTML = html;
-    // 渲染日历后绑定事件
-    this._bindPeriodCal(periods, today);
+    this._startCountdown();
+    this._startClock();
+  },
+
+  _startCountdown() {
+    const update = () => {
+      const diff = this._targetDate.getTime() - Date.now();
+      const days = Math.max(0, Math.floor(diff / 86400000));
+      const hours = Math.max(0, Math.floor((diff % 86400000) / 3600000));
+      const minutes = Math.max(0, Math.floor((diff % 3600000) / 60000));
+      const dEl = $('#cdDays'), hEl = $('#cdHours'), mEl = $('#cdMinutes');
+      if (dEl) dEl.textContent = String(days).padStart(2, '0');
+      if (hEl) hEl.textContent = String(hours).padStart(2, '0');
+      if (mEl) mEl.textContent = String(minutes).padStart(2, '0');
+    };
+    update();
+    this._cdTimer = setInterval(update, 60000);
+  },
+
+  _startClock() {
+    const timeEl = $('#fanStatusTime');
+    if (!timeEl) return;
+    const tick = () => {
+      const now = new Date();
+      timeEl.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    };
+    this._clockTimer = setInterval(tick, 1000);
   },
   _periodCardHTML(periodInfo, periods, today) {
     const now = new Date();
@@ -3611,6 +3702,9 @@ const App = {
       map[view].render();
       $(`#view-${view}`).classList.add('active');
     }
+    // 首页舞台背景显隐
+    const stageBg = $('#stageHeroBg');
+    if (stageBg) stageBg.classList.toggle('show', view === 'home');
     $('.content').scrollTop = 0;
   },
   seed() {
