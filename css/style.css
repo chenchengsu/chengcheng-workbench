@@ -3164,7 +3164,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   background-position: center 20%; background-size: cover; background-repeat: no-repeat;
   opacity: 0; transform: scale(1.04);
   transition: opacity 1s ease, transform 1.4s ease;
-  filter: brightness(0.68) saturate(0.92) contrast(1.05);
+  filter: brightness(1.0) saturate(1.05) contrast(1.02);
 }
 .stage-hero-bg.show {
   opacity: 1; transform: scale(1);
@@ -3172,12 +3172,13 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .stage-hero-bg::after {
   content: ''; position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 120% 80% at 50% 25%, rgba(124,58,237,0.22), transparent 60%),
+    radial-gradient(ellipse 120% 80% at 50% 25%, rgba(124,58,237,0.12), transparent 60%),
     linear-gradient(180deg,
-      rgba(6,6,12,0.70) 0%,
-      rgba(6,6,12,0.20) 38%,
-      rgba(46,16,101,0.45) 70%,
-      rgba(6,6,12,0.95) 100%);
+      rgba(6,6,12,0.38) 0%,
+      rgba(6,6,12,0.05) 35%,
+      rgba(6,6,12,0.08) 60%,
+      rgba(46,16,101,0.28) 80%,
+      rgba(6,6,12,0.92) 100%);
   pointer-events: none;
 }
 .stage-hero-bg::before {
