@@ -3623,3 +3623,128 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border: 1px dashed rgba(255,255,255,0.14);
   border-radius: 24px;
 }
+
+/* ========================================
+   健康/记事本/拼豆：细节组件 Dock 化
+   粉色选中态 -> 白色 + 紫色光晕，实底块 -> 透明玻璃
+   ======================================== */
+/* 粉色玻璃卡（健康体重主卡） */
+.view:not(#view-home) .glass-pink {
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 20px rgba(167,139,250,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+/* 筛选 chips（记事/拼豆） */
+.view:not(#view-home) .filter-chip {
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 999px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+.view:not(#view-home) .filter-chip.active {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(167,139,250,0.35);
+}
+/* 记事本待办勾选按钮 */
+.view:not(#view-home) .nb-todo-check-btn.checked {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.35);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(167,139,250,0.45);
+}
+/* 记事本待办添加行 */
+.view:not(#view-home) .nb-todo-add-row {
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 18px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+/* 拼豆：色系切换 chip */
+.view:not(#view-home) .fam-chip {
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 18px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+.view:not(#view-home) .fam-chip.active {
+  border-color: rgba(255,255,255,0.20);
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 0 12px rgba(167,139,250,0.35), inset 0 1px 0 rgba(255,255,255,0.10);
+}
+/* 拼豆：加减步进 / 编辑 / 确认取消 小按钮 */
+.view:not(#view-home) .bead-step,
+.view:not(#view-home) .bead-edit,
+.view:not(#view-home) .bead-adj-ok,
+.view:not(#view-home) .bead-adj-cancel {
+  border-radius: 999px;
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+.view:not(#view-home) .bead-adj-ok {
+  border-color: rgba(255,255,255,0.20);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(167,139,250,0.45);
+}
+/* 拼豆：库存调整弹层 / 低库存提示条 / 导入统计块 */
+.view:not(#view-home) .bead-adj-pop {
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 18px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+.view:not(#view-home) .bead-low-item,
+.view:not(#view-home) .import-stat {
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 16px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+/* 拼豆：底部操作栏（原实底渐变 -> 透明玻璃） */
+.view:not(#view-home) .bead-actionbar {
+  background: transparent;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+/* 报销 period-tab 选中态 */
+.view:not(#view-home) .period-tab.active {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.18);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(167,139,250,0.35);
+}
+/* 表单输入框：胶囊化 + 白边（全局，弹窗内表单同样生效） */
+.form-input,
+.form-select,
+.form-textarea {
+  background: rgba(8, 8, 16, 0);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 14px;
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+}
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: rgba(255,255,255,0.24);
+  background: rgba(255,255,255,0.05);
+  box-shadow: 0 0 12px rgba(167,139,250,0.30);
+}
+/* 弹窗卡片：透明玻璃 Dock 化（modal 挂在 body 下，全局生效） */
+.modal-overlay .modal {
+  background: rgba(8, 8, 16, 0.18);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -8px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+}
