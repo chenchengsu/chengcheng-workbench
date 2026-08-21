@@ -546,7 +546,7 @@ const HomeView = {
     const monthExpense = Store.getAccounts().filter(e => monthKey(e.date) === monthKey(today) && e.type === 'expense')
       .reduce((s, e) => s + parseFloat(e.amount || 0), 0).toFixed(2);
     const ws = Store.getWeights().sort((a, b) => a.date.localeCompare(b.date));
-    const latestWeight = ws.length ? parseFloat(ws[ws.length - 1].value).toFixed(2) : '--';
+    const latestWeight = ws.length ? parseFloat(ws[ws.length - 1].weight).toFixed(2) : '--';
 
     let html = `
     <div class="fan-home v3">
