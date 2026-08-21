@@ -558,7 +558,6 @@ const HomeView = {
       <div class="live-clock">
         <div class="live-clock-time" id="liveClockTime">00:00:00</div>
         <div class="live-clock-date" id="liveClockDate"></div>
-        <div class="live-clock-live"><i class="cd-live-dot"></i>实时</div>
       </div>
 
       <div class="info-card" onclick="App.navigate('account')">
@@ -572,10 +571,10 @@ const HomeView = {
       </div>
 
       <div class="tool-row">
+        <div class="tool-mini" onclick="App.navigate('account')"><span>💰</span>记账</div>
         <div class="tool-mini" onclick="App.navigate('health','weight')"><span>⚖️</span>健康</div>
         <div class="tool-mini" onclick="App.navigate('notebook')"><span>📝</span>记事</div>
         <div class="tool-mini" onclick="App.navigate('bead')"><span>🎨</span>拼豆</div>
-        <div class="tool-mini" onclick="App.navigate('account')"><span>💰</span>记账</div>
       </div>
 
       <div style="height:28px"></div>
