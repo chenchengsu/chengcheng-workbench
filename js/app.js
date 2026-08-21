@@ -1237,10 +1237,10 @@ const AccountView = {
 
     let html = `<div class="page-header page-header-row">
       <div class="page-header-actions" style="margin-left:auto">
-        <button class="btn btn-glass btn-sm btn-clear-data" onclick="AccountView.clearAllData()" title="清除数据">🗑</button>
-        <button class="btn btn-glass btn-sm" style="color:var(--info)" onclick="AccountView.switchViewMode('reimburse')">💰 报销</button>
-        <button class="btn btn-glass btn-sm" style="color:var(--info)" onclick="AccountView.exportAllData()" title="导出全部记账数据（CSV）">📤 导出</button>
-        <button class="btn btn-primary btn-sm" onclick="AccountView.openAdd()">+ 记一笔</button>
+        <button class="btn btn-glass btn-sm btn-clear-data" onclick="AccountView.clearAllData()" title="清除数据"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        <button class="btn btn-glass btn-sm" style="color:var(--info)" onclick="AccountView.switchViewMode('reimburse')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><line x1="16" y1="8" x2="8" y2="8"/><line x1="16" y1="12" x2="8" y2="12"/></svg> 报销</button>
+        <button class="btn btn-glass btn-sm" style="color:var(--info)" onclick="AccountView.exportAllData()" title="导出全部记账数据（CSV）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> 导出</button>
+        <button class="btn btn-primary btn-sm" onclick="AccountView.openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 记一笔</button>
       </div>
     </div>`;
 
@@ -1260,7 +1260,7 @@ const AccountView = {
     html += `<div class="glass account-balance-card">
       <div class="dash-card-header" style="margin-bottom:0">
         <div class="dash-card-title">
-          <div class="dash-card-title-icon" style="background:var(--info-bg)">🏦</div>
+          <div class="dash-card-title-icon" style="background:rgba(167,139,250,0.16);color:#fff"><svg style="width:15px;height:15px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div>
           国库
         </div>
         <div class="flex items-center" style="gap:8px">
@@ -1345,7 +1345,7 @@ const AccountView = {
 
     // 收支日历
     html += `<div class="glass chart-card">
-      <div class="section-title">📅 收支日历</div>
+      <div class="section-title"><svg style="width:15px;height:15px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> 收支日历</div>
       <div id="accCal"></div>
       <div id="accDayContent"></div>
     </div>`;
