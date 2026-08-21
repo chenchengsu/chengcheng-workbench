@@ -22,7 +22,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=117">
+  <link rel="stylesheet" href="css/style.css?v=118">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -54,8 +54,8 @@
     <div class="orb orb-3"></div>
   </div>
 
-  <!-- 首页舞台背景（仅在首页显示） -->
-  <div class="stage-hero-bg" id="stageHeroBg"></div>
+  <!-- 舞台背景（所有板块常驻显示） -->
+  <div class="stage-hero-bg show" id="stageHeroBg"></div>
 
   <!-- 启动动画：首页实时预览放大铺满屏幕 -->
   <div class="app-launch" id="appLaunch">
@@ -135,9 +135,9 @@
   <!-- Toast -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="js/bead-data.js?v=117"></script>
-  <script src="js/bead-stock.js?v=117"></script>
-  <script src="js/app.js?v=117"></script>
+  <script src="js/bead-data.js?v=118"></script>
+  <script src="js/bead-stock.js?v=118"></script>
+  <script src="js/app.js?v=118"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').then(reg => {
