@@ -3748,3 +3748,39 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   border-radius: 24px 24px 0 0;
   box-shadow: 0 -8px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
 }
+
+/* ===== v121：列表项 Dock 化（与底部导航栏一致） ===== */
+/* 健康-历史记录/经期记录、记事本-笔记/待办、拼豆-修改记录 的每条记录改为透明玻璃胶囊 */
+.view:not(#view-home) .history-list { padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.view:not(#view-home) .nb-list { gap: 8px; }
+.view:not(#view-home) .bead-log-list { gap: 8px; }
+.view:not(#view-home) .history-item,
+.view:not(#view-home) .nb-item,
+.view:not(#view-home) .nb-todo-item,
+.view:not(#view-home) .bead-log-item {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  padding: 10px 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+.view:not(#view-home) .history-item:hover,
+.view:not(#view-home) .nb-item:hover,
+.view:not(#view-home) .bead-log-item:hover {
+  border-color: rgba(255, 255, 255, 0.20);
+  background: rgba(255, 255, 255, 0.03);
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 18px;
+}
+.view:not(#view-home) .history-item:active,
+.view:not(#view-home) .nb-item:active { transform: scale(0.985); }
+.view:not(#view-home) .bead-log-ic { color: var(--purple); display: inline-flex; align-items: center; }
+.view:not(#view-home) .section-title svg,
+.view:not(#view-home) .nb-section-title svg,
+.view:not(#view-home) .bead-log-title svg,
+.view:not(#view-home) .bead-threshold svg { color: var(--purple); }
+.view:not(#view-home) .empty-state-icon svg { color: var(--text-secondary); }
