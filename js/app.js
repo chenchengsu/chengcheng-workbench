@@ -535,50 +535,85 @@ const ChartMgr = {
    首页仪表盘
    ============================================ */
 const HomeView = {
+  _clockTimer: null,
+
   render() {
+    if (this._clockTimer) { clearInterval(this._clockTimer); this._clockTimer = null; }
+
     const now = new Date();
-    const days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
-    const dateStr = `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} · ${days[now.getDay()]}`;
+    const daysCN = ['周日','周一','周二','周三','周四','周五','周六'];
+    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const dateStr = `${now.getMonth()+1}月${now.getDate()}日 · ${daysCN[now.getDay()]}`;
+    const yr = now.getFullYear();
 
     let html = `
-    <div class="fan-home">
-      <div class="fan-section-title">
-        <span class="fan-title-text">快捷工具</span>
-        <span class="fan-title-line"></span>
+    <div class="fan-home v2">
+      <!-- 顶部信息行 -->
+      <div class="fan-v2-header">
+        <div class="fan-v2-greet">Good Evening</div>
+        <div class="fan-v2-date">${dateStr} · ${yr}</div>
       </div>
 
-      <div class="fan-tools-grid">
-        <div class="glass fan-tool-card" onclick="App.navigate('account')">
-          <div class="fan-tool-icon" style="--tint:#60a5fa">💰</div>
-          <div class="fan-tool-name">记账</div>
-          <div class="fan-tool-desc">收支明细</div>
+      <!-- 大号时间 -->
+      <div class="fan-time-hero" id="fanTimeHero">
+        <div class="fan-time-num" id="fanTimeNum">${timeStr}</div>
+        <div class="fan-time-glow"></div>
+        <div class="fan-time-label">STAGE TIME</div>
+      </div>
+
+      <!-- 快捷工具 -->
+      <div class="fan-v2-section-title">
+        <span class="fan-v2-title-line"></span>
+        <span class="fan-v2-title-text">快捷工具</span>
+        <span class="fan-v2-title-line"></span>
+      </div>
+
+      <div class="fan-v2-grid">
+        <div class="fan-v2-card glass" onclick="App.navigate('account')">
+          <div class="fan-v2-icon" style="--glow:#60a5fa">💰</div>
+          <div class="fan-v2-name">记账</div>
+          <div class="fan-v2-hint">Account</div>
         </div>
-        <div class="glass fan-tool-card" onclick="App.navigate('health','weight')">
-          <div class="fan-tool-icon" style="--tint:#34d399">⚖️</div>
-          <div class="fan-tool-name">健康</div>
-          <div class="fan-tool-desc">体重 / 经期</div>
+        <div class="fan-v2-card glass" onclick="App.navigate('health','weight')">
+          <div class="fan-v2-icon" style="--glow:#34d399">⚖️</div>
+          <div class="fan-v2-name">健康</div>
+          <div class="fan-v2-hint">Health</div>
         </div>
-        <div class="glass fan-tool-card" onclick="App.navigate('notebook')">
-          <div class="fan-tool-icon" style="--tint:#fbbf24">📝</div>
-          <div class="fan-tool-name">记事本</div>
-          <div class="fan-tool-desc">灵感记录</div>
+        <div class="fan-v2-card glass" onclick="App.navigate('notebook')">
+          <div class="fan-v2-icon" style="--glow:#fbbf24">📝</div>
+          <div class="fan-v2-name">记事本</div>
+          <div class="fan-v2-hint">Notes</div>
         </div>
-        <div class="glass fan-tool-card" onclick="App.navigate('bead')">
-          <div class="fan-tool-icon" style="--tint:#f472b6">🎨</div>
-          <div class="fan-tool-name">拼豆</div>
-          <div class="fan-tool-desc">色号库存</div>
+        <div class="fan-v2-card glass" onclick="App.navigate('bead')">
+          <div class="fan-v2-icon" style="--glow:#f472b6">🎨</div>
+          <div class="fan-v2-name">拼豆</div>
+          <div class="fan-v2-hint">Beads</div>
         </div>
       </div>
 
-      <div class="fan-date-card">
-        <span>${dateStr}</span>
+      <!-- 底部光条 -->
+      <div class="fan-v2-footer">
+        <div class="fan-v2-bar"></div>
+        <div class="fan-v2-caption">All Workbench</div>
       </div>
 
-      <div style="height:40px"></div>
+      <div style="height:32px"></div>
     </div>
     `;
 
     $('#view-home').innerHTML = html;
+    this._startClock();
+  },
+
+  _startClock() {
+    const numEl = $('#fanTimeNum');
+    if (!numEl) return;
+    const tick = () => {
+      const now = new Date();
+      numEl.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    };
+    tick();
+    this._clockTimer = setInterval(tick, 1000);
   },
 
   _periodCardHTML(periodInfo, periods, today) {
