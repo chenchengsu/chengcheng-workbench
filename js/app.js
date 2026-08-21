@@ -2772,8 +2772,24 @@ const NotebookView = {
   },
   editTodo(id) {
     const t = Store.getTodos().find(x => x.id === id); if (!t) return;
-    const newText = prompt('编辑待办：', t.text);
-    if (newText !== null && newText.trim()) { Store.updateTodo(id, { text: newText.trim() }); this.renderDay(); }
+    Modal.open('编辑待办', `
+      <div class="form-group"><label class="form-label">待办内容</label>
+        <input class="form-input" id="nbTodoEditInput" value="${escHtml(t.text)}" maxlength="200"
+          onkeydown="if(event.key==='Enter')NotebookView.saveTodoEdit('${id}')"></div>
+      <div class="form-actions">
+        <button class="btn btn-glass" onclick="Modal.close()">取消</button>
+        <button class="btn btn-primary" onclick="NotebookView.saveTodoEdit('${id}')">保存</button>
+      </div>
+    `);
+    const inp = $('#nbTodoEditInput');
+    if (inp) { inp.focus(); inp.select(); }
+  },
+  saveTodoEdit(id) {
+    const inp = $('#nbTodoEditInput'); if (!inp) return;
+    const text = inp.value.trim();
+    if (!text) { Toast.show('请输入内容', 'error'); return; }
+    Store.updateTodo(id, { text });
+    Modal.close(); this.renderCal(); this.renderDay(); Toast.show('已更新');
   },
   delTodo(id) { ConfirmDialog.show('确认删除？', () => { Store.deleteTodo(id); this.renderCal(); this.renderDay(); Toast.show('已删除'); }); }
 };
