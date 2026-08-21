@@ -535,85 +535,88 @@ const ChartMgr = {
    首页仪表盘
    ============================================ */
 const HomeView = {
+  _cdTimer: null,
   _clockTimer: null,
+  // 下一场演唱会时间（可自行修改）
+  _targetDate: new Date('2026-09-15T19:30:00+08:00'),
 
   render() {
+    if (this._cdTimer) { clearInterval(this._cdTimer); this._cdTimer = null; }
     if (this._clockTimer) { clearInterval(this._clockTimer); this._clockTimer = null; }
 
-    const now = new Date();
-    const daysCN = ['周日','周一','周二','周三','周四','周五','周六'];
-    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-    const dateStr = `${now.getMonth()+1}月${now.getDate()}日 · ${daysCN[now.getDay()]}`;
-    const yr = now.getFullYear();
+    const today = todayStr();
+    const todayExpense = Store.getAccounts().filter(e => e.date === today && e.type === 'expense')
+      .reduce((s, e) => s + parseFloat(e.amount || 0), 0).toFixed(2);
+    const monthExpense = Store.getAccounts().filter(e => monthKey(e.date) === monthKey(today) && e.type === 'expense')
+      .reduce((s, e) => s + parseFloat(e.amount || 0), 0).toFixed(2);
+    const ws = Store.getWeights().sort((a, b) => a.date.localeCompare(b.date));
+    const latestWeight = ws.length ? parseFloat(ws[ws.length - 1].value).toFixed(2) : '--';
+    const noteCount = Store.getNotes().length;
 
     let html = `
-    <div class="fan-home v2">
-      <!-- 顶部信息行 -->
-      <div class="fan-v2-header">
-        <div class="fan-v2-greet">Good Evening</div>
-        <div class="fan-v2-date">${dateStr} · ${yr}</div>
+    <div class="fan-home v3">
+      <div class="concert-top">
+        <div class="concert-tagline">CONCERT · SHANGHAI 2026</div>
+        <div class="concert-bell" onclick="App.navigate('notebook')">🛎️</div>
       </div>
 
-      <!-- 大号时间 -->
-      <div class="fan-time-hero" id="fanTimeHero">
-        <div class="fan-time-num" id="fanTimeNum">${timeStr}</div>
-        <div class="fan-time-glow"></div>
-        <div class="fan-time-label">STAGE TIME</div>
+      <div class="concert-title">未·LIVE 上海站</div>
+      <div class="concert-meta">上海体育场 · 9月15日 19:30</div>
+
+      <div class="cd-card">
+        <div class="cd-header">
+          <span>距开场还有</span>
+          <span class="cd-live"><i class="cd-live-dot"></i>实时同步</span>
+        </div>
+        <div class="cd-grid">
+          <div class="cd-box"><div class="cd-num" id="cdDays">00</div><div class="cd-unit">天</div></div>
+          <div class="cd-box"><div class="cd-num" id="cdHours">00</div><div class="cd-unit">小时</div></div>
+          <div class="cd-box"><div class="cd-num" id="cdMinutes">00</div><div class="cd-unit">分钟</div></div>
+          <div class="cd-box"><div class="cd-num" id="cdSeconds">00</div><div class="cd-unit">秒</div></div>
+        </div>
+        <div class="cd-hint"><span>🎫</span> 内场看台 · 建议 17:30 前到场完成安检</div>
       </div>
 
-      <!-- 快捷工具 -->
-      <div class="fan-v2-section-title">
-        <span class="fan-v2-title-line"></span>
-        <span class="fan-v2-title-text">快捷工具</span>
-        <span class="fan-v2-title-line"></span>
-      </div>
-
-      <div class="fan-v2-grid">
-        <div class="fan-v2-card glass" onclick="App.navigate('account')">
-          <div class="fan-v2-icon" style="--glow:#60a5fa">💰</div>
-          <div class="fan-v2-name">记账</div>
-          <div class="fan-v2-hint">Account</div>
-        </div>
-        <div class="fan-v2-card glass" onclick="App.navigate('health','weight')">
-          <div class="fan-v2-icon" style="--glow:#34d399">⚖️</div>
-          <div class="fan-v2-name">健康</div>
-          <div class="fan-v2-hint">Health</div>
-        </div>
-        <div class="fan-v2-card glass" onclick="App.navigate('notebook')">
-          <div class="fan-v2-icon" style="--glow:#fbbf24">📝</div>
-          <div class="fan-v2-name">记事本</div>
-          <div class="fan-v2-hint">Notes</div>
-        </div>
-        <div class="fan-v2-card glass" onclick="App.navigate('bead')">
-          <div class="fan-v2-icon" style="--glow:#f472b6">🎨</div>
-          <div class="fan-v2-name">拼豆</div>
-          <div class="fan-v2-hint">Beads</div>
+      <div class="info-card" onclick="App.navigate('account')">
+        <div class="info-header"><span class="info-icon">✨</span> 今日工作台</div>
+        <div class="info-grid">
+          <div class="info-item"><div class="info-val">${todayExpense}</div><div class="info-label">今日支出</div></div>
+          <div class="info-item"><div class="info-val">${monthExpense}</div><div class="info-label">本月支出</div></div>
+          <div class="info-item"><div class="info-val">${latestWeight}</div><div class="info-label">当前体重</div></div>
+          <div class="info-item"><div class="info-val">${noteCount}</div><div class="info-label">记事条数</div></div>
         </div>
       </div>
 
-      <!-- 底部光条 -->
-      <div class="fan-v2-footer">
-        <div class="fan-v2-bar"></div>
-        <div class="fan-v2-caption">All Workbench</div>
+      <div class="tool-row">
+        <div class="tool-mini" onclick="App.navigate('health','weight')"><span>⚖️</span>健康</div>
+        <div class="tool-mini" onclick="App.navigate('notebook')"><span>📝</span>记事</div>
+        <div class="tool-mini" onclick="App.navigate('bead')"><span>🎨</span>拼豆</div>
+        <div class="tool-mini" onclick="App.navigate('account')"><span>💰</span>记账</div>
       </div>
 
-      <div style="height:32px"></div>
+      <div style="height:28px"></div>
     </div>
     `;
 
     $('#view-home').innerHTML = html;
-    this._startClock();
+    this._startCountdown();
   },
 
-  _startClock() {
-    const numEl = $('#fanTimeNum');
-    if (!numEl) return;
-    const tick = () => {
-      const now = new Date();
-      numEl.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  _startCountdown() {
+    const update = () => {
+      const diff = this._targetDate.getTime() - Date.now();
+      const days = Math.max(0, Math.floor(diff / 86400000));
+      const hours = Math.max(0, Math.floor((diff % 86400000) / 3600000));
+      const minutes = Math.max(0, Math.floor((diff % 3600000) / 60000));
+      const seconds = Math.max(0, Math.floor((diff % 60000) / 1000));
+      const d = $('#cdDays'), h = $('#cdHours'), m = $('#cdMinutes'), s = $('#cdSeconds');
+      if (d) d.textContent = String(days).padStart(2, '0');
+      if (h) h.textContent = String(hours).padStart(2, '0');
+      if (m) m.textContent = String(minutes).padStart(2, '0');
+      if (s) s.textContent = String(seconds).padStart(2, '0');
     };
-    tick();
-    this._clockTimer = setInterval(tick, 1000);
+    update();
+    this._cdTimer = setInterval(update, 1000);
   },
 
   _periodCardHTML(periodInfo, periods, today) {
