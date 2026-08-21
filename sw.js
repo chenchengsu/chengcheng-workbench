@@ -1,4 +1,4 @@
-const CACHE = 'chengcheng-workbench-v104';
+const CACHE = 'chengcheng-workbench-v105';
 const ASSETS = [
   './',
   './index.html',
