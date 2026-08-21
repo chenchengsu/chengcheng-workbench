@@ -547,7 +547,6 @@ const HomeView = {
       .reduce((s, e) => s + parseFloat(e.amount || 0), 0).toFixed(2);
     const ws = Store.getWeights().sort((a, b) => a.date.localeCompare(b.date));
     const latestWeight = ws.length ? parseFloat(ws[ws.length - 1].value).toFixed(2) : '--';
-    const noteCount = Store.getNotes().length;
 
     let html = `
     <div class="fan-home v3">
@@ -562,7 +561,9 @@ const HomeView = {
           <div class="info-item"><div class="info-val">${todayExpense}</div><div class="info-label">今日支出</div></div>
           <div class="info-item"><div class="info-val">${monthExpense}</div><div class="info-label">本月支出</div></div>
           <div class="info-item"><div class="info-val">${latestWeight}</div><div class="info-label">当前体重</div></div>
-          <div class="info-item"><div class="info-val">${noteCount}</div><div class="info-label">记事条数</div></div>
+          <div class="info-item" style="cursor:pointer" onclick="event.stopPropagation();CloudBackup.open()">
+            <div class="info-val">☁️</div><div class="info-label">导出 / 导入</div>
+          </div>
         </div>
       </div>
 
