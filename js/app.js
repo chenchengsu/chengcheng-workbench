@@ -325,6 +325,13 @@ const Modal = {
     $('#modalHeader').innerHTML = `<span>${title}</span><span class="modal-close" onclick="Modal.close()">✕</span>`;
     $('#modalBody').innerHTML = body;
     $('#modalOverlay').classList.add('active');
+    // 屏蔽输入法的自动填充建议（密码 / 支付方式 / 地址）
+    $$('#modalBody input, #modalBody textarea, #modalBody select').forEach(el => {
+      el.setAttribute('autocomplete', 'off');
+      el.setAttribute('autocorrect', 'off');
+      el.setAttribute('autocapitalize', 'off');
+      el.setAttribute('spellcheck', 'false');
+    });
   },
   close() { $('#modalOverlay').classList.remove('active'); }
 };
@@ -1153,7 +1160,7 @@ const AccountView = {
         <div class="correction-divider">收入 − 支出 = 结余</div>
         <div class="form-group">
           <label class="form-label">实际余额</label>
-          <input class="form-input" type="number" step="0.01" id="cor-actual" placeholder="输入账户实际余额" autofocus>
+          <input class="form-input" type="number" step="0.01" inputmode="decimal" autocomplete="off" name="amt" id="cor-actual" placeholder="输入账户实际余额" autofocus>
           <div class="text-xs text-tertiary" style="margin-top:4px">输入实际余额后，系统自动生成一笔纠正记录使结余与实际一致</div>
         </div>
         <div class="correction-preview" id="cor-preview" style="display:none">
@@ -1509,7 +1516,7 @@ const AccountView = {
           <input type="hidden" id="ac-type" value="${selType}">
           <input type="hidden" id="ac-expense-sub" value="${expenseSub}">
         </div>
-        <div class="form-group"><label class="form-label">金额</label><input class="form-input" type="number" step="0.01" id="ac-amount" placeholder="0.00" value="${e?e.amount:''}" autofocus></div>
+        <div class="form-group"><label class="form-label">金额</label><input class="form-input" type="number" step="0.01" inputmode="decimal" autocomplete="off" name="amt" id="ac-amount" placeholder="0.00" value="${e?e.amount:''}" autofocus></div>
       </div>
       <div class="form-group"><label class="form-label">日期</label>${dateFieldHTML('ac-date', e?e.date:todayStr())}</div>
       <div class="form-group" id="ac-transfer-group" style="${selType==='transfer'?'':'display:none'}">
