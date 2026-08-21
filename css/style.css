@@ -3784,3 +3784,61 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .view:not(#view-home) .bead-log-title svg,
 .view:not(#view-home) .bead-threshold svg { color: var(--purple); }
 .view:not(#view-home) .empty-state-icon svg { color: var(--text-secondary); }
+
+/* ===== v123 国库卡片 Dock 化（与底部TAB导航一致） ===== */
+#view-account .account-balance-total {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+#view-account .account-balance-list { gap: 8px; }
+#view-account .account-balance-item {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 9px 12px;
+  margin: 0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+}
+#view-account .account-balance-item:hover:not(.reorder-mode) {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.20);
+  border-radius: 16px;
+}
+#view-account .account-balance-item:active { transform: scale(0.985); }
+#view-account .account-balance-item.reorder-mode { background: rgba(255, 255, 255, 0.02); }
+#view-account .account-balance-icon {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+}
+#view-account .add-account-row { border-top: none; padding-top: 4px; }
+#view-account .btn-add-account {
+  background: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 16px;
+  padding: 10px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+#view-account .btn-add-account:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.20);
+  border-style: solid;
+  color: var(--text);
+}
+#view-account .btn-add-account:active { transform: scale(0.985); }
+#view-account .btn-add-account .add-icon {
+  background: rgba(167, 139, 250, 0.18);
+  color: #c9b8ff;
+}
+#view-account .btn-add-account:hover .add-icon {
+  background: var(--pink);
+  color: #fff;
+}
+
