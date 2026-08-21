@@ -310,12 +310,35 @@ const CONFIG = {
 const Toast = {
   show(msg, type = 'success') {
     const c = $('#toastContainer');
+    // 同屏最多 3 条，避免连点刷屏
+    while (c.children.length >= 3) c.firstChild.remove();
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    const icons = { success: '✓', error: '✕', info: 'ℹ' };
-    t.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
+    const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '!' };
+    t.innerHTML = `<span class="toast-ic ${type}">${icons[type]||''}</span><span>${msg}</span>`;
     c.appendChild(t);
     setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(-10px)'; t.style.transition = 'all 0.3s'; setTimeout(() => t.remove(), 300); }, 2200);
+  }
+};
+
+// ===== 表单行内错误提示（红框 + 文字说明，输入时自动清除） =====
+const FormErr = {
+  show(sel, msg) {
+    const el = typeof sel === 'string' ? $(sel) : sel;
+    if (!el) { Toast.show(msg, 'error'); return; }
+    el.classList.add('error');
+    const g = el.closest('.form-group') || el.parentElement;
+    let tip = g.querySelector('.form-error');
+    if (!tip) { tip = document.createElement('div'); tip.className = 'form-error'; g.appendChild(tip); }
+    tip.textContent = msg;
+    el.addEventListener('input', () => this.clear(el), { once: true });
+    if (el.focus) el.focus();
+  },
+  clear(el) {
+    el.classList.remove('error');
+    const g = el.closest('.form-group') || el.parentElement;
+    const tip = g && g.querySelector('.form-error');
+    if (tip) tip.remove();
   }
 };
 
@@ -336,6 +359,26 @@ const Modal = {
   close() { $('#modalOverlay').classList.remove('active'); }
 };
 document.addEventListener('click', e => { if (e.target.id === 'modalOverlay') Modal.close(); });
+// ESC 关闭弹窗
+document.addEventListener('keydown', e => { if (e.key === 'Escape') Modal.close(); });
+// 防重复点击：按钮点击后 0.8s 内锁死（配合 CSS [data-busy]）
+document.addEventListener('click', e => {
+  const b = e.target.closest('.btn, .fab-export');
+  if (!b || b.dataset.busy) return;
+  b.dataset.busy = '1';
+  setTimeout(() => { delete b.dataset.busy; }, 800);
+}, true);
+
+// ===== 全局错误捕获：局部报错不白屏，给出友好提示（5s 节流） =====
+(function () {
+  let lastErr = 0;
+  const friendly = () => {
+    const now = Date.now();
+    if (now - lastErr > 5000) { lastErr = now; Toast.show('出了点小问题，操作未完成，请重试', 'error'); }
+  };
+  window.addEventListener('error', e => { console.error('[All]', e.message, e.filename, e.lineno); friendly(); });
+  window.addEventListener('unhandledrejection', e => { console.error('[All] Promise:', e.reason); friendly(); });
+})();
 
 // ===== 确认弹窗（替代原生confirm） =====
 const ConfirmDialog = {
@@ -554,7 +597,7 @@ const HomeView = {
         <div class="live-clock-date" id="liveClockDate"></div>
       </div>
 
-      <div class="fab-export" onclick="CloudBackup.open()" title="导出 / 导入">
+      <div class="fab-export" onclick="CloudBackup.open()" title="导出 / 导入" role="button" tabindex="0" aria-label="数据备份与恢复" onkeydown="if(event.key==='Enter')CloudBackup.open()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
       </div>
     </div>
@@ -828,7 +871,7 @@ const HealthView = {
   },
   saveWeight(id) {
     const wt = parseFloat($('#w-weight').value);
-    if (!wt) { Toast.show('请输入体重', 'error'); return; }
+    if (!wt) { FormErr.show('#w-weight', '请输入体重数字，如 65.50'); return; }
     const data = {
       date: $('#w-date').value, weight: wt
     };
@@ -946,9 +989,9 @@ const HealthView = {
   },
   savePeriod(id) {
     const startDate = $('#p-start').value;
-    if (!startDate) { Toast.show('请选择开始日期', 'error'); return; }
+    if (!startDate) { FormErr.show('#p-start', '请选择开始日期'); return; }
     const endDate = $('#p-end').value || null;
-    if (endDate && endDate < startDate) { Toast.show('结束日期不能早于开始日期', 'error'); return; }
+    if (endDate && endDate < startDate) { FormErr.show('#p-end', '结束日期不能早于开始日期'); return; }
     const note = $('#p-note').value.trim();
     const data = { startDate, endDate, note };
     if (id) { Store.updatePeriod(id, data); Toast.show('已更新'); }
@@ -1645,7 +1688,7 @@ const AccountView = {
   },
   save(id) {
     const amt = parseFloat($('#ac-amount').value);
-    if (!amt || amt <= 0) { Toast.show('请输入有效金额', 'error'); return; }
+    if (!amt || amt <= 0) { FormErr.show('#ac-amount', '请输入有效金额，且需大于 0'); return; }
     let type = $('#ac-type').value;
     // expenseSub 仅用于兼容历史数据（旧的 refund / reimburse 记录），表单已不再提供该选项
     const expenseSub = $('#ac-expense-sub') ? $('#ac-expense-sub').value : 'normal';
@@ -1656,7 +1699,7 @@ const AccountView = {
     if (type === 'transfer') {
       const from = $('#ac-tf-from').value;
       const to = $('#ac-tf-to').value;
-      if (from === to) { Toast.show('转出和转入账户不能相同', 'error'); return; }
+      if (from === to) { FormErr.show('#ac-tf-to', '转出和转入账户不能相同'); return; }
       const outNote = note ? `${note} · 转出至${to}` : `转出至${to}`;
       const inNote = note ? `${note} · 转入自${from}` : `转入自${from}`;
       if (id) {
@@ -2742,7 +2785,7 @@ const NotebookView = {
   saveNote(editId) {
     const title = $('#nbTitle').value.trim();
     const content = $('#nbContent').value.trim();
-    if (!title && !content) { Toast.show('请输入内容', 'error'); return; }
+    if (!title && !content) { FormErr.show('#nbContent', '标题和内容至少填写一项'); return; }
     if (editId) {
       Store.updateNote(editId, { title, content });
       Toast.show('已更新');
@@ -3501,6 +3544,7 @@ const CloudBackup = {
   doImport(e) {
     const file = e.target.files[0];
     if (!file) return;
+    Toast.show('正在解析备份文件…', 'info');
     const reader = new FileReader();
     reader.onload = () => {
       try {
@@ -3541,7 +3585,11 @@ const App = {
     $$('.nav-item').forEach(item => {
       item.addEventListener('click', () => this.navigate(item.dataset.view));
     });
-    this.navigate('home');
+    // 恢复上次所在板块（刷新 / 重开不丢失）
+    let lastView = 'home';
+    try { lastView = localStorage.getItem('cc_last_view') || 'home'; } catch (e) {}
+    if (!['home', 'account', 'health', 'notebook', 'bead'].includes(lastView)) lastView = 'home';
+    this.navigate(lastView);
     this._fillLaunchPreview();
   },
   _fillLaunchPreview() {
@@ -3604,6 +3652,7 @@ const App = {
       if (view === 'health' && tab) HealthView.activeTab = tab;
       map[view].render();
       $(`#view-${view}`).classList.add('active');
+      try { localStorage.setItem('cc_last_view', view); } catch (e) {}
     }
     // 舞台背景：所有板块常驻显示
     const stageBg = $('#stageHeroBg');
