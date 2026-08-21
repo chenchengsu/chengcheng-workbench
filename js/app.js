@@ -3575,9 +3575,9 @@ const App = {
       map[view].render();
       $(`#view-${view}`).classList.add('active');
     }
-    // 首页舞台背景显隐
+    // 舞台背景：所有板块常驻显示
     const stageBg = $('#stageHeroBg');
-    if (stageBg) stageBg.classList.toggle('show', view === 'home');
+    if (stageBg) stageBg.classList.add('show');
     $('.content').scrollTop = 0;
   },
   seed() {
