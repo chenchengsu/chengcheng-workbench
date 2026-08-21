@@ -618,7 +618,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   align-items: center;
   gap: 4px;
   padding: 8px 10px;
-  background: rgba(8, 8, 16, 0.74);
+  background: rgba(8, 8, 16, 0);
   backdrop-filter: blur(28px) saturate(160%);
   -webkit-backdrop-filter: blur(28px) saturate(160%);
   border: 1px solid rgba(255,255,255,0.10);
@@ -3160,12 +3160,13 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background-image: url('../stage-hero.png');
   background-position: center 15%; background-size: cover; background-repeat: no-repeat;
-  opacity: 1; transform: scale(1);
+  opacity: 0; transform: none;
   transition: none;
   filter: brightness(1.0) saturate(1.05) contrast(1.02);
 }
 .stage-hero-bg.show {
-  opacity: 1; transform: scale(1);
+  opacity: 1; transform: none;
+  transition: none;
 }
 .stage-hero-bg::after {
   content: ''; position: absolute; inset: 0;
@@ -3218,7 +3219,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 /* 工作台信息卡（磨砂透明度 0：无底色无模糊） */
 .info-card {
   margin-top: clamp(120px, 22vh, 240px); padding: 16px; border-radius: 20px;
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0);
   border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(22px) saturate(150%);
   -webkit-backdrop-filter: blur(22px) saturate(150%);
@@ -3261,7 +3262,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 .tool-mini {
   display: flex; flex-direction: column; align-items: center; gap: 7px;
   padding: 14px 4px; border-radius: 18px;
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0);
   border: 1px solid rgba(255,255,255,0.09);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
