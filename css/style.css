@@ -3160,7 +3160,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 /* 舞台背景：仅在首页显示 */
 .stage-hero-bg {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image: url('stage-hero.png');
+  background-image: url('../stage-hero.png');
   background-position: center 20%; background-size: cover; background-repeat: no-repeat;
   opacity: 0; transform: scale(1.04);
   transition: opacity 1s ease, transform 1.4s ease;
