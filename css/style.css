@@ -3155,8 +3155,192 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   margin-bottom: 12px;
 }
 
-/* ===== 报销管理 ===== */
-.tag-row { display:flex; gap:8px; flex-wrap:wrap; }
+/* ===== 应援工作台首页 ===== */
+
+/* 舞台背景：仅在首页显示 */
+.stage-hero-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url('stage-hero.png');
+  background-position: center top; background-size: cover; background-repeat: no-repeat;
+  opacity: 0; transform: scale(1.04);
+  transition: opacity .9s ease, transform 1.2s ease;
+  filter: brightness(0.72) saturate(0.95);
+}
+.stage-hero-bg.show {
+  opacity: 1; transform: scale(1);
+}
+.stage-hero-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg,
+    rgba(6,6,12,0.55) 0%,
+    rgba(6,6,12,0.20) 35%,
+    rgba(46,16,101,0.38) 70%,
+    rgba(6,6,12,0.92) 100%);
+  pointer-events: none;
+}
+
+.fan-home {
+  position: relative; z-index: 1;
+  padding: calc(12px + env(safe-area-inset-top)) 18px 0;
+  min-height: 100%;
+}
+
+/* 顶部状态栏 */
+.fan-statusbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 4px; font-size: 13px; color: rgba(255,255,255,0.75);
+}
+.fan-status-left { display: flex; align-items: center; gap: 8px; }
+.fan-status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #c4b5fd;
+  box-shadow: 0 0 10px rgba(196,181,253,0.7);
+  animation: fanPulse 2s ease-in-out infinite;
+}
+@keyframes fanPulse { 0%,100% { opacity: .7; } 50% { opacity: 1; box-shadow: 0 0 14px rgba(196,181,253,0.95); } }
+.fan-status-city { letter-spacing: 0.04em; font-weight: 500; }
+.fan-status-time { font-variant-numeric: tabular-nums; font-weight: 700; letter-spacing: 0.02em; color: #fff; }
+.fan-status-right { display: flex; align-items: center; gap: 8px; }
+.fan-status-signal { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+.fan-status-signal i { width: 3px; border-radius: 1px; background: rgba(255,255,255,0.45); }
+.fan-status-signal i:nth-child(1) { height: 4px; }
+.fan-status-signal i:nth-child(2) { height: 6px; }
+.fan-status-signal i:nth-child(3) { height: 8px; }
+.fan-status-signal i:nth-child(4) { height: 10px; background: rgba(255,255,255,0.85); }
+.fan-status-battery { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+/* 倒计时 Hero */
+.fan-hero { text-align: center; padding: 28px 0 24px; }
+.fan-hero-label {
+  font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.55); font-weight: 500;
+}
+.fan-countdown {
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 6px; margin: 16px 0 14px;
+}
+.fan-cd-col { display: flex; flex-direction: column; align-items: center; min-width: 74px; }
+.fan-cd-num {
+  font-size: 68px; font-weight: 800; line-height: 1; letter-spacing: -0.04em;
+  color: #f4f2ff;
+  text-shadow:
+    0 0 26px rgba(167,139,250,0.48),
+    0 0 10px rgba(255,255,255,0.22);
+  font-variant-numeric: tabular-nums;
+}
+.fan-cd-unit {
+  font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.12em;
+  margin-top: 10px; font-weight: 500;
+}
+.fan-cd-sep {
+  font-size: 42px; font-weight: 300; color: rgba(196,181,253,0.75);
+  padding-bottom: 18px;
+  text-shadow: 0 0 18px rgba(196,181,253,0.4);
+  animation: fanSepBlink 2s ease-in-out infinite;
+}
+@keyframes fanSepBlink { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+.fan-hero-meta { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.fan-hero-tag {
+  padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.fan-hero-tag.silver {
+  background: linear-gradient(135deg, rgba(226,232,240,0.14), rgba(148,163,184,0.10));
+  border-color: rgba(226,232,240,0.25);
+  color: #e2e8f0;
+}
+
+/* 分区标题 */
+.fan-section-title { display: flex; align-items: center; gap: 12px; margin: 24px 0 12px; }
+.fan-title-text { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.92); letter-spacing: 0.02em; }
+.fan-title-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.18), transparent);
+}
+
+/* 快捷工具网格 */
+.fan-tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.fan-tool-card {
+  padding: 14px 6px; text-align: center; border-radius: var(--r-lg);
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+  transition: all .2s ease; cursor: pointer;
+}
+.fan-tool-card:active { transform: scale(0.95); border-color: rgba(196,181,253,0.35); }
+.fan-tool-icon {
+  width: 44px; height: 44px; margin: 0 auto 8px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+  background: rgba(255,255,255,0.06);
+  background: color-mix(in srgb, var(--tint) 18%, rgba(255,255,255,0.06));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--tint) 28%, transparent), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.fan-tool-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+.fan-tool-desc { font-size: 11px; color: rgba(255,255,255,0.45); }
+
+/* 玻璃卡片 */
+.fan-card {
+  padding: 16px; border-radius: var(--r-xl);
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.10);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-card);
+}
+
+/* 今日行程 */
+.fan-schedule { display: flex; flex-direction: column; gap: 14px; }
+.fan-schedule-item { display: flex; align-items: center; gap: 12px; }
+.fan-schedule-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: #c4b5fd;
+  box-shadow: 0 0 10px rgba(196,181,253,0.6);
+}
+.fan-schedule-dot.dim { background: rgba(255,255,255,0.25); box-shadow: none; }
+.fan-schedule-info { flex: 1; min-width: 0; }
+.fan-schedule-time { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 2px; font-variant-numeric: tabular-nums; }
+.fan-schedule-name { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.92); }
+.fan-schedule-loc { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+.fan-schedule-status {
+  font-size: 11px; font-weight: 700; padding: 5px 10px; border-radius: 12px; flex-shrink: 0;
+  background: rgba(196,181,253,0.12); color: #c4b5fd; border: 1px solid rgba(196,181,253,0.22);
+}
+.fan-schedule-status.soon { background: rgba(251,191,36,0.10); color: #fbbf24; border-color: rgba(251,191,36,0.25); }
+
+/* 应援任务 */
+.fan-tasks { display: flex; flex-direction: column; gap: 12px; }
+.fan-task {
+  display: flex; align-items: center; gap: 12px; cursor: pointer;
+}
+.fan-task input[type=checkbox] { position: absolute; opacity: 0; width: 0; height: 0; }
+.fan-task-check {
+  width: 20px; height: 20px; border-radius: 6px; flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.fan-task input:checked + .fan-task-check {
+  background: linear-gradient(135deg, #c4b5fd, #8b5cf6);
+  border-color: transparent;
+  box-shadow: 0 0 12px rgba(139,92,246,0.35);
+}
+.fan-task input:checked + .fan-task-check::after {
+  content: '✓'; color: #fff; font-size: 12px; font-weight: 700;
+}
+.fan-task-text { font-size: 14px; color: rgba(255,255,255,0.82); transition: color .2s; }
+.fan-task-text.done { text-decoration: line-through; color: rgba(255,255,255,0.4); }
+
+/* 日期小卡 */
+.fan-date-card {
+  margin-top: 24px; text-align: center; font-size: 12px;
+  color: rgba(255,255,255,0.38); letter-spacing: 0.06em;
+}
+
 .tag-chip {
   padding:6px 16px; border-radius:20px; font-size:13px; cursor:pointer;
   background:var(--glass-bg); color:var(--text-secondary); border:1.5px solid var(--border);
@@ -3339,3 +3523,6 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   flex-shrink:0; margin-left:6px;
 }
 .reim-item-ops .icon-btn { font-size:14px; padding:2px 4px; line-height:1; }
+
+/* 修复：报销管理 tag-row */
+.tag-row { display:flex; gap:8px; flex-wrap:wrap; }
