@@ -1516,7 +1516,7 @@ const AccountView = {
           <input type="hidden" id="ac-type" value="${selType}">
           <input type="hidden" id="ac-expense-sub" value="${expenseSub}">
         </div>
-        <div class="form-group"><label class="form-label">金额</label><input class="form-input" type="number" step="0.01" inputmode="decimal" autocomplete="off" name="amt" id="ac-amount" placeholder="0.00" value="${e?e.amount:''}" autofocus></div>
+        <div class="form-group"><label class="form-label">金额</label><input class="form-input" type="text" inputmode="none" readonly id="ac-amount" placeholder="点击下方键盘输入" value="${e?e.amount:''}">${this._numPadHTML()}</div>
       </div>
       <div class="form-group"><label class="form-label">日期</label>${dateFieldHTML('ac-date', e?e.date:todayStr())}</div>
       <div class="form-group" id="ac-transfer-group" style="${selType==='transfer'?'':'display:none'}">
@@ -1575,6 +1575,30 @@ const AccountView = {
       <div class="form-group"><label class="form-label">备注</label><input class="form-input" id="ac-note" placeholder="可选备注" value="${e?e.note||'':''}"></div>
       <div class="form-actions"><button class="btn btn-glass" onclick="Modal.close()">取消</button><button class="btn btn-primary" onclick="AccountView.save('${e?e.id:''}')">保存</button></div>
     `;
+  },
+  _numPadHTML() {
+    const key = (k, label, cls) => `<button type="button" class="np-key ${cls||''}" onclick="AccountView._np('${k}')">${label||k}</button>`;
+    const delSvg = '<svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/></svg>';
+    return `<div class="num-pad">
+      ${key('1')}${key('2')}${key('3')}
+      ${key('4')}${key('5')}${key('6')}
+      ${key('7')}${key('8')}${key('9')}
+      ${key('.')}${key('0')}${key('del', delSvg, 'np-fn')}
+      <button type="button" class="np-key np-clr" onclick="AccountView._np('clr')">清空</button>
+    </div>`;
+  },
+  _np(k) {
+    const el = $('#ac-amount'); if (!el) return;
+    let v = el.value || '';
+    if (k === 'del') { v = v.slice(0, -1); }
+    else if (k === 'clr') { v = ''; }
+    else if (k === '.') { if (!v.includes('.')) v = v === '' ? '0.' : v + '.'; }
+    else {
+      const dec = v.split('.')[1];
+      if (v.includes('.')) { if ((dec||'').length < 2) v += k; }
+      else if (v.replace('-','').length < 8) v += k;
+    }
+    el.value = v;
   },
   selType(t) {
     $('#ac-type').value = t;
