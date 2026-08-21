@@ -3195,15 +3195,10 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   display: flex; flex-direction: column;
 }
 
-/* 顶部艺人与场次信息 */
+/* 顶栏（仅保留铃铛入口） */
 .concert-top {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-end;
   margin: 2px 2px 10px;
-}
-.concert-tagline {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.52); text-transform: uppercase;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
 .concert-bell {
   width: 34px; height: 34px; border-radius: 50%;
@@ -3216,50 +3211,30 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 }
 .concert-bell:active { transform: scale(0.92); background: rgba(255,255,255,0.10); }
 
-.concert-title {
-  margin: 0 2px 4px;
-  font-size: 34px; font-weight: 800; letter-spacing: 0.02em;
-  color: #ffffff;
-  text-shadow:
-    0 2px 14px rgba(0,0,0,0.45),
-    0 0 30px rgba(167,139,250,0.25);
+/* 实时数字时钟组件（精确到秒） */
+.live-clock {
+  text-align: center;
+  margin: 10px 0 28px;
 }
-.concert-meta {
-  margin: 0 2px 28px;
+.live-clock-time {
+  font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: 0.01em;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+  text-shadow:
+    0 0 30px rgba(167,139,250,0.55),
+    0 0 64px rgba(139,92,246,0.28),
+    0 2px 12px rgba(0,0,0,0.4);
+}
+.live-clock-date {
+  margin-top: 12px;
   font-size: 13px; font-weight: 500;
   color: rgba(255,255,255,0.62);
+  letter-spacing: 0.08em;
   text-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
-
-/* 倒计时玻璃卡片 */
-.cd-card {
-  padding: 18px; border-radius: 22px;
-  background: rgba(255,255,255,0.055);
-  border: 1px solid rgba(255,255,255,0.12);
-  backdrop-filter: blur(26px) saturate(160%);
-  -webkit-backdrop-filter: blur(26px) saturate(160%);
-  box-shadow:
-    0 18px 46px rgba(0,0,0,0.38),
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    0 0 0 1px rgba(167,139,250,0.06);
-  overflow: hidden; position: relative;
-}
-.cd-card::before {
-  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-  background: linear-gradient(150deg, rgba(255,255,255,0.22), rgba(167,139,250,0.18) 40%, transparent 65%, rgba(255,255,255,0.06));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  pointer-events: none;
-}
-.cd-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 14px; position: relative; z-index: 1;
-  font-size: 13px; font-weight: 600;
-  color: rgba(255,255,255,0.68);
-}
-.cd-live {
+.live-clock-live {
   display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 10px; border-radius: 12px;
+  margin-top: 10px; padding: 4px 10px; border-radius: 12px;
   background: rgba(52,211,153,0.08);
   border: 1px solid rgba(52,211,153,0.18);
   color: #34d399; font-size: 11px; font-weight: 700;
@@ -3271,31 +3246,6 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   animation: livePulse 1.8s ease-in-out infinite;
 }
 @keyframes livePulse { 0%,100%{opacity:.7; transform:scale(.9);} 50%{opacity:1; transform:scale(1.1);} }
-.cd-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-  position: relative; z-index: 1;
-}
-.cd-box {
-  padding: 12px 2px 10px; text-align: center; border-radius: 14px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.09);
-  backdrop-filter: blur(12px);
-}
-.cd-num {
-  font-size: 30px; font-weight: 800; line-height: 1;
-  color: #ffffff; font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 18px rgba(196,181,253,0.45);
-}
-.cd-unit {
-  font-size: 10px; font-weight: 500;
-  color: rgba(255,255,255,0.48); margin-top: 6px;
-}
-.cd-hint {
-  margin-top: 12px; position: relative; z-index: 1;
-  font-size: 11px; font-weight: 500;
-  color: rgba(255,255,255,0.45);
-  display: flex; align-items: center; gap: 6px;
-}
 
 /* 工作台信息卡 */
 .info-card {
@@ -3356,8 +3306,7 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
 
 /* 宽屏微调 */
 @media (min-width: 600px) {
-  .concert-title { font-size: 42px; }
-  .cd-num { font-size: 36px; }
+  .live-clock-time { font-size: 76px; }
   .info-val { font-size: 20px; }
 }
 
