@@ -3232,20 +3232,6 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   letter-spacing: 0.08em;
   text-shadow: 0 1px 6px rgba(0,0,0,0.35);
 }
-.live-clock-live {
-  display: inline-flex; align-items: center; gap: 5px;
-  margin-top: 10px; padding: 4px 10px; border-radius: 12px;
-  background: rgba(52,211,153,0.08);
-  border: 1px solid rgba(52,211,153,0.18);
-  color: #34d399; font-size: 11px; font-weight: 700;
-}
-.cd-live-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 8px rgba(52,211,153,0.65);
-  animation: livePulse 1.8s ease-in-out infinite;
-}
-@keyframes livePulse { 0%,100%{opacity:.7; transform:scale(.9);} 50%{opacity:1; transform:scale(1.1);} }
 
 /* 工作台信息卡 */
 .info-card {
