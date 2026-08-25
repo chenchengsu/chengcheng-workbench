@@ -4057,3 +4057,17 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   white-space: pre-wrap;
   word-break: break-word;
 }
+#view-concert .concert-item-del {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 8px;
+  opacity: 0.55;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+#view-concert .concert-item-del:hover { opacity: 1; color: #ff6b81; background: rgba(255,255,255,0.06); }
