@@ -3524,7 +3524,8 @@ const ConcertView = {
   render() {
     const view = document.getElementById('view-concert');
     if (!view) return;
-    const list = Store.getConcerts().slice().sort((a, b) => (b.date || b.when || '').localeCompare(a.date || a.when || ''));
+    if (!this._editId) this._dateValue = '';
+    const list = Store.getConcerts().slice().sort((a, b) => (a.date || a.when || '').localeCompare(b.date || b.when || ''));
     const listHtml = list.length === 0
       ? `<div class="empty-state"><div class="empty-state-text">还没有记录</div></div>`
       : list.map(c => `
@@ -3551,7 +3552,9 @@ const ConcertView = {
           <input class="form-input" id="cIdol" placeholder="爱豆 / 歌手" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="form-row-2col">
-          <input class="form-input" id="cDate" type="date" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <div class="date-field" id="cDateField" onclick="ConcertView.openDatePicker()">
+            <span class="${this._dateValue ? 'date-field-text' : 'date-field-text placeholder'}" id="cDateText">${this._dateValue ? (() => { const p = this._dateValue.split('-'); return p[0] + '.' + p[1] + '.' + p[2]; })() : '选择日期'}</span>
+          </div>
           <input class="form-input" id="cCity" placeholder="城市" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="form-group">
@@ -3579,7 +3582,7 @@ const ConcertView = {
     if (!idol) { this._formErr('请输入爱豆 / 歌手'); return; }
     const data = {
       idol,
-      date: $('#cDate').value || '',
+      date: this._dateValue || '',
       city: $('#cCity').value.trim(),
       venue: $('#cVenue').value.trim(),
       seat: $('#cSeat').value.trim(),
@@ -3600,14 +3603,61 @@ const ConcertView = {
     const c = Store.getConcerts().find(x => x.id === id);
     if (!c) return;
     this._editId = id;
+    this._dateValue = c.date || '';
     this.render();
     $('#cIdol').value = c.idol || '';
-    $('#cDate').value = c.date || '';
     $('#cCity').value = c.city || (c.when && !c.date ? c.when : '');
     $('#cVenue').value = c.venue || '';
     $('#cSeat').value = c.seat || '';
     $('#cNote').value = c.note || '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+  openDatePicker() {
+    let base = this._dateValue ? new Date(this._dateValue + 'T00:00:00') : new Date();
+    let y = base.getFullYear(), m = base.getMonth();
+    const overlay = document.createElement('div');
+    overlay.className = 'date-picker-overlay';
+    const build = () => {
+      const first = new Date(y, m, 1);
+      const startDay = first.getDay();
+      const daysInMonth = new Date(y, m + 1, 0).getDate();
+      let cells = '';
+      for (let i = 0; i < startDay; i++) cells += '<div class="dp-cell empty"></div>';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const val = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+        cells += `<div class="dp-cell${val === this._dateValue ? ' selected' : ''}" data-d="${val}">${d}</div>`;
+      }
+      overlay.querySelector('.dp-body').innerHTML = `
+        <div class="dp-head">
+          <button class="dp-nav" data-nav="-1" aria-label="上个月">‹</button>
+          <div class="dp-title">${y} 年 ${m + 1} 月</div>
+          <button class="dp-nav" data-nav="1" aria-label="下个月">›</button>
+        </div>
+        <div class="dp-week">${['日', '一', '二', '三', '四', '五', '六'].map(w => `<div class="dp-w">${w}</div>`).join('')}</div>
+        <div class="dp-grid">${cells}</div>`;
+    };
+    overlay.innerHTML = `<div class="date-picker glass"><div class="dp-body"></div><button class="btn btn-primary dp-done" onclick="this.closest('.date-picker-overlay').remove()">完成</button></div>`;
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.dp-body').addEventListener('click', e => {
+      const nav = e.target.closest('[data-nav]');
+      if (nav) { m += parseInt(nav.dataset.nav, 10); if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; } build(); return; }
+      const cell = e.target.closest('[data-d]');
+      if (cell) { this._dateValue = cell.dataset.d; this._syncDateField(); overlay.remove(); }
+    });
+    document.body.appendChild(overlay);
+    build();
+  },
+  _syncDateField() {
+    const text = $('#cDateText');
+    if (!text) return;
+    if (this._dateValue) {
+      const p = this._dateValue.split('-');
+      text.textContent = p[0] + '.' + p[1] + '.' + p[2];
+      text.classList.remove('placeholder');
+    } else {
+      text.textContent = '选择日期';
+      text.classList.add('placeholder');
+    }
   },
   remove(id) {
     ConfirmDialog.show('删除这场演唱会记录？', () => {
