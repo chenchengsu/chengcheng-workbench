@@ -3545,8 +3545,8 @@ const ConcertView = {
 
     view.innerHTML = `
       <div class="concert-form-card glass">
-        <button class="concert-ocr-btn" id="cOcrBtn" onclick="ConcertView.startOcr()">识别票夹 · 拍照 / 上传自动填表</button>
-        <input type="file" id="cOcrFile" accept="image/*" capture="environment" style="display:none" onchange="ConcertView.onOcrFile(event)">
+        <button class="concert-ocr-btn" id="cOcrBtn" onclick="ConcertView.startOcr()">识别票夹 · 从相册选择自动填表</button>
+        <input type="file" id="cOcrFile" accept="image/*" style="display:none" onchange="ConcertView.onOcrFile(event)">
         <div class="concert-ocr-status" id="cOcrStatus" style="display:none">
           <div class="concert-ocr-bar"><div class="concert-ocr-fill" id="cOcrFill"></div></div>
           <div class="concert-ocr-msg" id="cOcrMsg"></div>
@@ -3702,7 +3702,7 @@ const ConcertView = {
       this._setOcrMsg('正在识别票夹文字…', 0.12);
       const ret = await worker.recognize(canvas);
       const text = (ret && ret.data && ret.data.text) || '';
-      if (!text.trim()) { this._setOcrMsg('未能识别到文字，请重拍或手动填写', 0); Toast.show('未识别到文字', 'info'); return; }
+      if (!text.trim()) { this._setOcrMsg('未能识别到文字，请重新选择图片或手动填写', 0); Toast.show('未识别到文字', 'info'); return; }
       const res = this._parseTicketText(text);
       this._applyOcrResult(res);
       const parts = [];
