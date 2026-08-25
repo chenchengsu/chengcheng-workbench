@@ -3521,29 +3521,20 @@ const BeadView = {
 // ===== 演唱会记录 =====
 const ConcertView = {
   _editId: null,
-  _star(n) {
-    let s = '';
-    for (let i = 1; i <= 5; i++) {
-      const filled = i <= n;
-      s += `<svg viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="star${filled ? ' star-on' : ''}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
-    }
-    return s;
-  },
   render() {
     const view = document.getElementById('view-concert');
     if (!view) return;
-    const list = Store.getConcerts().slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const list = Store.getConcerts().slice().sort((a, b) => (b.when || '').localeCompare(a.when || ''));
     const listHtml = list.length === 0
       ? `<div class="empty-state"><div class="empty-state-icon">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'}</div><div class="empty-state-text">还没有记录</div></div>`
       : list.map(c => `
           <div class="concert-item glass" onclick="ConcertView.edit('${c.id}')">
             <div class="concert-item-head">
               <div class="concert-item-idol">${escapeHtml(c.idol || '未填')}</div>
-              <div class="concert-item-stars">${this._star(parseInt(c.rating || 0, 10))}</div>
+              <button class="concert-item-del" title="删除" aria-label="删除" onclick="event.stopPropagation();ConcertView.remove('${c.id}')">✕</button>
             </div>
             <div class="concert-item-meta">
-              ${c.date ? `<span>${c.date}</span>` : ''}
-              ${c.city ? `<span>· ${escapeHtml(c.city)}</span>` : ''}
+              ${c.when || c.date || c.city ? `<span>${escapeHtml(c.when || [c.date, c.city].filter(Boolean).join(' '))}</span>` : ''}
               ${c.venue ? `<span>· ${escapeHtml(c.venue)}</span>` : ''}
               ${c.seat ? `<span>· ${escapeHtml(c.seat)}</span>` : ''}
             </div>
@@ -3568,18 +3559,14 @@ const ConcertView = {
         <div class="form-group">
           <input class="form-input" id="cIdol" placeholder="爱豆 / 歌手" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
-        <div class="form-row-2col">
-          <input class="form-input" id="cDate" type="date" autocomplete="off">
-          <input class="form-input" id="cCity" placeholder="城市" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="form-group">
+          <input class="form-input" id="cWhen" placeholder="时间 城市，如 2026.08.01 上海" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="form-group">
           <input class="form-input" id="cVenue" placeholder="场馆" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="form-group">
           <input class="form-input" id="cSeat" placeholder="座位区，如内场 A区" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-        </div>
-        <div class="form-group">
-          <input class="form-input" id="cRating" type="number" inputmode="numeric" min="0" max="5" step="1" placeholder="评分 1-5" autocomplete="off">
         </div>
         <div class="form-group">
           <textarea class="form-textarea" id="cNote" rows="2" placeholder="碎碎念（可选）" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
@@ -3598,16 +3585,12 @@ const ConcertView = {
   _clearErr() { FormErr.clear('#view-concert .concert-form-card'); },
   save() {
     const idol = $('#cIdol').value.trim();
-    const rating = parseInt($('#cRating').value, 10);
     if (!idol) { this._formErr('请输入爱豆 / 歌手'); return; }
-    if ($('#cRating').value !== '' && (isNaN(rating) || rating < 0 || rating > 5)) { this._formErr('评分请填 0-5 的整数'); return; }
     const data = {
       idol,
-      date: $('#cDate').value || '',
-      city: $('#cCity').value.trim(),
+      when: $('#cWhen').value.trim(),
       venue: $('#cVenue').value.trim(),
       seat: $('#cSeat').value.trim(),
-      rating: isNaN(rating) ? 0 : rating,
       note: $('#cNote').value.trim()
     };
     if (this._editId) {
@@ -3627,11 +3610,9 @@ const ConcertView = {
     this._editId = id;
     this.render();
     $('#cIdol').value = c.idol || '';
-    $('#cDate').value = c.date || '';
-    $('#cCity').value = c.city || '';
+    $('#cWhen').value = c.when || [c.date, c.city].filter(Boolean).join(' ');
     $('#cVenue').value = c.venue || '';
     $('#cSeat').value = c.seat || '';
-    $('#cRating').value = c.rating || '';
     $('#cNote').value = c.note || '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
