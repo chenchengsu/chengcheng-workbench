@@ -3526,12 +3526,12 @@ const ConcertView = {
     if (!view) return;
     const list = Store.getConcerts().slice().sort((a, b) => (b.when || '').localeCompare(a.when || ''));
     const listHtml = list.length === 0
-      ? `<div class="empty-state"><div class="empty-state-icon">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'}</div><div class="empty-state-text">还没有记录</div></div>`
+      ? `<div class="empty-state"><div class="empty-state-text">还没有记录</div></div>`
       : list.map(c => `
           <div class="concert-item glass" onclick="ConcertView.edit('${c.id}')">
             <div class="concert-item-head">
               <div class="concert-item-idol">${escapeHtml(c.idol || '未填')}</div>
-              <button class="concert-item-del" title="删除" aria-label="删除" onclick="event.stopPropagation();ConcertView.remove('${c.id}')">✕</button>
+              <button class="concert-item-del" title="删除" aria-label="删除" onclick="event.stopPropagation();ConcertView.remove('${c.id}')">删除</button>
             </div>
             <div class="concert-item-meta">
               ${c.when || c.date || c.city ? `<span>${escapeHtml(c.when || [c.date, c.city].filter(Boolean).join(' '))}</span>` : ''}
@@ -3545,7 +3545,6 @@ const ConcertView = {
     view.innerHTML = `
       <div class="dash-header">
         <div class="dash-header-title">
-          <svg class="dash-header-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           <span>演唱会记录</span>
         </div>
         <div class="dash-header-sub">去过哪些场，记下来</div>
@@ -3553,7 +3552,6 @@ const ConcertView = {
 
       <div class="concert-form-card glass">
         <div class="section-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
           <span>记一场</span>
         </div>
         <div class="form-group">
@@ -3575,7 +3573,6 @@ const ConcertView = {
       </div>
 
       <div class="section-title" style="margin-top:18px">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H1l8-8 8 8h-8m0 0v12"/><path d="M9 21h12"/></svg>
         <span>去过的场（${list.length}）</span>
       </div>
       ${listHtml}
