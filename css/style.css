@@ -4160,3 +4160,46 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   font-weight: 600;
 }
 .dp-done { width: 100%; margin-top: 14px; }
+
+/* ===== v138: 演唱会 票夹识别（浏览器端 OCR）===== */
+#view-concert .concert-ocr-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  margin-bottom: 14px;
+  background: rgba(167, 139, 250, 0.14);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 14px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+#view-concert .concert-ocr-btn:active { transform: scale(0.98); }
+#view-concert .concert-ocr-btn:hover { background: rgba(167, 139, 250, 0.22); }
+#view-concert .concert-ocr-status { margin-bottom: 14px; }
+#view-concert .concert-ocr-bar {
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.10);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+#view-concert .concert-ocr-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--pink, #a78bfa), #c4b5fd);
+  transition: width 0.25s ease;
+}
+#view-concert .concert-ocr-msg {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
