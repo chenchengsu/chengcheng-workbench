@@ -3525,7 +3525,7 @@ const ConcertView = {
     const view = document.getElementById('view-concert');
     if (!view) return;
     if (!this._editId) this._dateValue = '';
-    const list = Store.getConcerts().slice().sort((a, b) => (a.date || a.when || '').localeCompare(b.date || b.when || ''));
+    const list = Store.getConcerts().slice().sort((a, b) => (b.date || b.when || '').localeCompare(a.date || a.when || ''));
     const listHtml = list.length === 0
       ? `<div class="empty-state"><div class="empty-state-text">还没有记录</div></div>`
       : list.map(c => `
