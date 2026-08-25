@@ -3524,7 +3524,7 @@ const ConcertView = {
   render() {
     const view = document.getElementById('view-concert');
     if (!view) return;
-    const list = Store.getConcerts().slice().sort((a, b) => (b.when || '').localeCompare(a.when || ''));
+    const list = Store.getConcerts().slice().sort((a, b) => (b.date || b.when || '').localeCompare(a.date || a.when || ''));
     const listHtml = list.length === 0
       ? `<div class="empty-state"><div class="empty-state-text">还没有记录</div></div>`
       : list.map(c => `
@@ -3534,7 +3534,7 @@ const ConcertView = {
               <button class="concert-item-del" title="删除" aria-label="删除" onclick="event.stopPropagation();ConcertView.remove('${c.id}')">删除</button>
             </div>
             <div class="concert-item-meta">
-              ${c.when || c.date || c.city ? `<span>${escapeHtml(c.when || [c.date, c.city].filter(Boolean).join(' '))}</span>` : ''}
+              ${c.date || c.city || c.when ? `<span>${escapeHtml([c.date, c.city].filter(Boolean).join(' ') || c.when || '')}</span>` : ''}
               ${c.venue ? `<span>· ${escapeHtml(c.venue)}</span>` : ''}
               ${c.seat ? `<span>· ${escapeHtml(c.seat)}</span>` : ''}
             </div>
@@ -3543,13 +3543,6 @@ const ConcertView = {
         `).join('');
 
     view.innerHTML = `
-      <div class="dash-header">
-        <div class="dash-header-title">
-          <span>演唱会记录</span>
-        </div>
-        <div class="dash-header-sub">去过哪些场，记下来</div>
-      </div>
-
       <div class="concert-form-card glass">
         <div class="section-title">
           <span>记一场</span>
@@ -3557,8 +3550,9 @@ const ConcertView = {
         <div class="form-group">
           <input class="form-input" id="cIdol" placeholder="爱豆 / 歌手" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
-        <div class="form-group">
-          <input class="form-input" id="cWhen" placeholder="时间 城市，如 2026.08.01 上海" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        <div class="form-row-2col">
+          <input class="form-input" id="cDate" type="date" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          <input class="form-input" id="cCity" placeholder="城市" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
         <div class="form-group">
           <input class="form-input" id="cVenue" placeholder="场馆" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
@@ -3585,7 +3579,8 @@ const ConcertView = {
     if (!idol) { this._formErr('请输入爱豆 / 歌手'); return; }
     const data = {
       idol,
-      when: $('#cWhen').value.trim(),
+      date: $('#cDate').value || '',
+      city: $('#cCity').value.trim(),
       venue: $('#cVenue').value.trim(),
       seat: $('#cSeat').value.trim(),
       note: $('#cNote').value.trim()
@@ -3607,7 +3602,8 @@ const ConcertView = {
     this._editId = id;
     this.render();
     $('#cIdol').value = c.idol || '';
-    $('#cWhen').value = c.when || [c.date, c.city].filter(Boolean).join(' ');
+    $('#cDate').value = c.date || '';
+    $('#cCity').value = c.city || (c.when && !c.date ? c.when : '');
     $('#cVenue').value = c.venue || '';
     $('#cSeat').value = c.seat || '';
     $('#cNote').value = c.note || '';
