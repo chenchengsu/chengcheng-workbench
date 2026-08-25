@@ -4082,3 +4082,81 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   transition: opacity 0.15s ease;
 }
 #view-concert input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+/* ===== v136: 演唱会自定义玻璃日历弹层 ===== */
+.date-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+}
+.date-picker {
+  width: 100%;
+  max-width: 320px;
+  background: rgba(18, 18, 28, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  padding: 16px;
+}
+.dp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.dp-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.dp-nav {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: var(--text);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.15s ease;
+}
+.dp-nav:hover { background: rgba(255, 255, 255, 0.12); }
+.dp-nav:active { transform: scale(0.92); }
+.dp-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+.dp-w {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 0;
+}
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.dp-cell {
+  text-align: center;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--text);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.dp-cell.empty { cursor: default; }
+.dp-cell:hover:not(.empty) { background: rgba(167, 139, 250, 0.14); }
+.dp-cell.selected {
+  background: var(--pink, #a78bfa);
+  color: #fff;
+  font-weight: 600;
+}
+.dp-done { width: 100%; margin-top: 14px; }
