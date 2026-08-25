@@ -4071,3 +4071,14 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   flex-shrink: 0;
 }
 #view-concert .concert-item-del:hover { opacity: 1; color: #ff6b81; background: rgba(255,255,255,0.06); }
+#view-concert input[type="date"] {
+  color-scheme: dark;
+  min-height: 44px;
+}
+#view-concert input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.82);
+  opacity: 0.75;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+#view-concert input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
