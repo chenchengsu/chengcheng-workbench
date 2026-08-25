@@ -89,6 +89,10 @@ function csvCell(v) {
   if (/[",\r\n]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
   return v;
 }
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 function monthKey(s) { return s.slice(0, 7); }
 function yearKey(s) { return s.slice(0, 4); }
 const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -175,7 +179,8 @@ const KEYS = {
   beadSeedVer: 'bead_seed_ver',
   beadColors: 'bead_colors',
   beadLogs: 'bead_logs',
-  beadDeleted: 'bead_deleted'
+  beadDeleted: 'bead_deleted',
+  concerts: 'concerts'
 };
 const Store = {
   _prefix: 'cc_',
@@ -248,6 +253,12 @@ const Store = {
   saveBeadLogs(v) { this.set(KEYS.beadLogs, v); },
   getBeadDeleted() { return this.get(KEYS.beadDeleted, []); },
   saveBeadDeleted(v) { this.set(KEYS.beadDeleted, v); },
+  // 演唱会记录
+  getConcerts() { return this.get(KEYS.concerts, []); },
+  saveConcerts(v) { this.set(KEYS.concerts, v); },
+  addConcert(c) { const a = this.getConcerts(); a.push({ id: uid(), ...c }); this.saveConcerts(a); },
+  updateConcert(id, u) { const a = this.getConcerts(); const i = a.findIndex(x => x.id === id); if (i >= 0) { a[i] = { ...a[i], ...u }; this.saveConcerts(a); } },
+  deleteConcert(id) { this.saveConcerts(this.getConcerts().filter(x => x.id !== id)); },
   // 云端备份：导出/导入全部数据
   exportAll() {
     const data = { __app: 'All', __version: 1, __exportedAt: new Date().toISOString() };
@@ -3507,6 +3518,132 @@ const BeadView = {
   }
 };
 
+// ===== 演唱会记录 =====
+const ConcertView = {
+  _editId: null,
+  _star(n) {
+    let s = '';
+    for (let i = 1; i <= 5; i++) {
+      const filled = i <= n;
+      s += `<svg viewBox="0 0 24 24" fill="${filled ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" class="star${filled ? ' star-on' : ''}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    }
+    return s;
+  },
+  render() {
+    const view = document.getElementById('view-concert');
+    if (!view) return;
+    const list = Store.getConcerts().slice().sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const listHtml = list.length === 0
+      ? `<div class="empty-state"><div class="empty-state-icon">${'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'}</div><div class="empty-state-text">还没有记录</div></div>`
+      : list.map(c => `
+          <div class="concert-item glass" onclick="ConcertView.edit('${c.id}')">
+            <div class="concert-item-head">
+              <div class="concert-item-idol">${escapeHtml(c.idol || '未填')}</div>
+              <div class="concert-item-stars">${this._star(parseInt(c.rating || 0, 10))}</div>
+            </div>
+            <div class="concert-item-meta">
+              ${c.date ? `<span>${c.date}</span>` : ''}
+              ${c.city ? `<span>· ${escapeHtml(c.city)}</span>` : ''}
+              ${c.venue ? `<span>· ${escapeHtml(c.venue)}</span>` : ''}
+              ${c.seat ? `<span>· ${escapeHtml(c.seat)}</span>` : ''}
+            </div>
+            ${c.note ? `<div class="concert-item-note">${escapeHtml(c.note)}</div>` : ''}
+          </div>
+        `).join('');
+
+    view.innerHTML = `
+      <div class="dash-header">
+        <div class="dash-header-title">
+          <svg class="dash-header-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span>演唱会记录</span>
+        </div>
+        <div class="dash-header-sub">去过哪些场，记下来</div>
+      </div>
+
+      <div class="concert-form-card glass">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span>记一场</span>
+        </div>
+        <div class="form-group">
+          <input class="form-input" id="cIdol" placeholder="爱豆 / 歌手" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="form-row-2col">
+          <input class="form-input" id="cDate" type="date" autocomplete="off">
+          <input class="form-input" id="cCity" placeholder="城市" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <input class="form-input" id="cVenue" placeholder="场馆" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <input class="form-input" id="cSeat" placeholder="座位区，如内场 A区" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="form-group">
+          <input class="form-input" id="cRating" type="number" inputmode="numeric" min="0" max="5" step="1" placeholder="评分 1-5" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <textarea class="form-textarea" id="cNote" rows="2" placeholder="碎碎念（可选）" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+        </div>
+        <button class="btn btn-primary btn-block" id="cSaveBtn" onclick="ConcertView.save()">保存</button>
+      </div>
+
+      <div class="section-title" style="margin-top:18px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11H1l8-8 8 8h-8m0 0v12"/><path d="M9 21h12"/></svg>
+        <span>去过的场（${list.length}）</span>
+      </div>
+      ${listHtml}
+    `;
+  },
+  _formErr(msg) { FormErr.show('#view-concert .concert-form-card', msg); },
+  _clearErr() { FormErr.clear('#view-concert .concert-form-card'); },
+  save() {
+    const idol = $('#cIdol').value.trim();
+    const rating = parseInt($('#cRating').value, 10);
+    if (!idol) { this._formErr('请输入爱豆 / 歌手'); return; }
+    if ($('#cRating').value !== '' && (isNaN(rating) || rating < 0 || rating > 5)) { this._formErr('评分请填 0-5 的整数'); return; }
+    const data = {
+      idol,
+      date: $('#cDate').value || '',
+      city: $('#cCity').value.trim(),
+      venue: $('#cVenue').value.trim(),
+      seat: $('#cSeat').value.trim(),
+      rating: isNaN(rating) ? 0 : rating,
+      note: $('#cNote').value.trim()
+    };
+    if (this._editId) {
+      Store.updateConcert(this._editId, data);
+      Toast.show('已更新');
+      this._editId = null;
+    } else {
+      Store.addConcert(data);
+      Toast.show('已记下这场');
+    }
+    this._clearErr();
+    this.render();
+  },
+  edit(id) {
+    const c = Store.getConcerts().find(x => x.id === id);
+    if (!c) return;
+    this._editId = id;
+    this.render();
+    $('#cIdol').value = c.idol || '';
+    $('#cDate').value = c.date || '';
+    $('#cCity').value = c.city || '';
+    $('#cVenue').value = c.venue || '';
+    $('#cSeat').value = c.seat || '';
+    $('#cRating').value = c.rating || '';
+    $('#cNote').value = c.note || '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+  remove(id) {
+    ConfirmDialog.show('删除这场演唱会记录？', () => {
+      Store.deleteConcert(id);
+      Toast.show('已删除');
+      this.render();
+    }, { title: '删除记录', confirmText: '删除', icon: '🗑' });
+  }
+};
+
 /* ============================================
    云端备份
    ============================================ */
@@ -3588,7 +3725,7 @@ const App = {
     // 恢复上次所在板块（刷新 / 重开不丢失）
     let lastView = 'home';
     try { lastView = localStorage.getItem('cc_last_view') || 'home'; } catch (e) {}
-    if (!['home', 'account', 'health', 'notebook', 'bead'].includes(lastView)) lastView = 'home';
+    if (!['home', 'account', 'health', 'notebook', 'bead', 'concert'].includes(lastView)) lastView = 'home';
     this.navigate(lastView);
     this._fillLaunchPreview();
   },
@@ -3647,7 +3784,7 @@ const App = {
     ChartMgr.destroyAll();
     $$('.nav-item').forEach(i => i.classList.toggle('active', i.dataset.view === view));
     $$('.view').forEach(v => v.classList.remove('active'));
-    const map = { home: HomeView, account: AccountView, health: HealthView, notebook: NotebookView, bead: BeadView };
+    const map = { home: HomeView, account: AccountView, health: HealthView, notebook: NotebookView, bead: BeadView, concert: ConcertView };
     if (map[view]) {
       if (view === 'health' && tab) HealthView.activeTab = tab;
       map[view].render();
