@@ -3545,6 +3545,12 @@ const ConcertView = {
 
     view.innerHTML = `
       <div class="concert-form-card glass">
+        <button class="concert-ocr-btn" id="cOcrBtn" onclick="ConcertView.startOcr()">识别票夹 · 拍照 / 上传自动填表</button>
+        <input type="file" id="cOcrFile" accept="image/*" capture="environment" style="display:none" onchange="ConcertView.onOcrFile(event)">
+        <div class="concert-ocr-status" id="cOcrStatus" style="display:none">
+          <div class="concert-ocr-bar"><div class="concert-ocr-fill" id="cOcrFill"></div></div>
+          <div class="concert-ocr-msg" id="cOcrMsg"></div>
+        </div>
         <div class="section-title">
           <span>记一场</span>
         </div>
@@ -3665,6 +3671,183 @@ const ConcertView = {
       Toast.show('已删除');
       this.render();
     }, { title: '删除记录', confirmText: '删除', icon: '🗑' });
+  },
+  // ===== v138: 票夹识别（浏览器端 OCR）=====
+  _ocrWorker: null,
+  _ocrLoading: null,
+  startOcr() {
+    const input = document.getElementById('cOcrFile');
+    if (input) input.click();
+  },
+  async onOcrFile(e) {
+    const input = e.target;
+    const file = input && input.files && input.files[0];
+    if (input) input.value = '';
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { Toast.show('请选择图片', 'error'); return; }
+    this._setOcrMsg('正在准备图片…', 0.02);
+    let canvas;
+    try { canvas = await this._downscaleImage(file, 1600); }
+    catch (err) { this._setOcrMsg('图片读取失败，请重试', 0); Toast.show('图片读取失败', 'error'); return; }
+    let worker;
+    try {
+      this._setOcrMsg('正在加载识别引擎（首次需下载语言包，请稍候）…', 0.05);
+      worker = await this._ensureWorker();
+    } catch (err) {
+      this._setOcrMsg(err.message || '识别引擎加载失败，请检查网络', 0);
+      Toast.show(err.message || '识别引擎加载失败', 'error');
+      return;
+    }
+    try {
+      this._setOcrMsg('正在识别票夹文字…', 0.12);
+      const ret = await worker.recognize(canvas);
+      const text = (ret && ret.data && ret.data.text) || '';
+      if (!text.trim()) { this._setOcrMsg('未能识别到文字，请重拍或手动填写', 0); Toast.show('未识别到文字', 'info'); return; }
+      const res = this._parseTicketText(text);
+      this._applyOcrResult(res);
+      const parts = [];
+      if (res.idol) parts.push(res.idol);
+      if (res.date) parts.push(res.date.replace(/-/g, '.'));
+      if (res.city) parts.push(res.city);
+      if (res.venue) parts.push(res.venue);
+      if (res.seat) parts.push(res.seat);
+      this._setOcrMsg('已识别并填入：' + (parts.join(' · ') || '（无）') + '\n请核对后点“保存”', 1);
+      Toast.show('识别完成，请核对');
+    } catch (err) {
+      this._setOcrMsg('识别失败：' + (err && err.message ? err.message : err), 0);
+      Toast.show('识别失败', 'error');
+    }
+  },
+  _ensureWorker() {
+    if (this._ocrWorker) return Promise.resolve(this._ocrWorker);
+    if (this._ocrLoading) return this._ocrLoading;
+    this._ocrLoading = new Promise((resolve, reject) => {
+      const init = () => {
+        try {
+          const w = window.Tesseract.createWorker('chi_sim+eng', 1, { logger: m => ConcertView._onOcrProgress(m) });
+          w.then(worker => { ConcertView._ocrWorker = worker; resolve(worker); })
+           .catch(err => { ConcertView._ocrLoading = null; reject(err); });
+        } catch (err) { ConcertView._ocrLoading = null; reject(err); }
+      };
+      if (window.Tesseract) { init(); return; }
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      s.onload = init;
+      s.onerror = () => { ConcertView._ocrLoading = null; reject(new Error('识别引擎加载失败，请检查网络')); };
+      document.head.appendChild(s);
+    });
+    return this._ocrLoading;
+  },
+  _onOcrProgress(m) {
+    if (!m || typeof m.progress !== 'number') return;
+    const pct = Math.max(0.02, Math.min(0.98, m.progress));
+    const fill = document.getElementById('cOcrFill');
+    if (fill) fill.style.width = (pct * 100).toFixed(0) + '%';
+    if (m.status) this._setOcrMsg(this._statusText(m.status), pct);
+  },
+  _statusText(s) {
+    const map = {
+      'loading tesseract core': '加载识别内核…',
+      'initializing tesseract': '初始化引擎…',
+      'loading language traineddata': '下载语言包…',
+      'initializing api': '准备识别…',
+      'recognizing text': '正在识别文字…'
+    };
+    return map[s] || s;
+  },
+  _setOcrMsg(text, pct) {
+    const msg = document.getElementById('cOcrMsg');
+    if (msg) msg.textContent = text;
+    const fill = document.getElementById('cOcrFill');
+    if (fill && typeof pct === 'number') fill.style.width = (pct * 100).toFixed(0) + '%';
+    const box = document.getElementById('cOcrStatus');
+    if (box) box.style.display = 'block';
+  },
+  _applyOcrResult(res) {
+    if (res.idol) { const el = document.getElementById('cIdol'); if (el) el.value = res.idol; }
+    if (res.date) { this._dateValue = res.date; this._syncDateField(); }
+    if (res.city) { const el = document.getElementById('cCity'); if (el) el.value = res.city; }
+    if (res.venue) { const el = document.getElementById('cVenue'); if (el) el.value = res.venue; }
+    if (res.seat) { const el = document.getElementById('cSeat'); if (el) el.value = res.seat; }
+  },
+  _downscaleImage(file, maxDim) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        resolve(canvas);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('img')); };
+      img.src = url;
+    });
+  },
+  _parseTicketText(text) {
+    const t = (text || '').replace(/\r/g, '');
+    const res = { idol: '', date: '', city: '', venue: '', seat: '', note: '' };
+    const pad = n => String(n).padStart(2, '0');
+    const d1 = t.match(/(\d{4})\s*[-./年]\s*(\d{1,2})\s*[-./月]\s*(\d{1,2})\s*日?/)
+            || t.match(/(\d{4})\s*[-./]\s*(\d{1,2})\s*[-./]\s*(\d{1,2})/);
+    if (d1) {
+      const y = +d1[1], mo = +d1[2], d = +d1[3];
+      if (y >= 2000 && y <= 2100 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31) res.date = `${y}-${pad(mo)}-${pad(d)}`;
+    } else {
+      const d2 = t.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*日?/);
+      if (d2) {
+        const mo = +d2[1], d = +d2[2];
+        if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) res.date = `${new Date().getFullYear()}-${pad(mo)}-${pad(d)}`;
+      }
+    }
+    const CITIES = ['北京','上海','广州','深圳','成都','杭州','重庆','武汉','南京','西安','苏州','天津','长沙','青岛','厦门','郑州','无锡','宁波','福州','昆明','合肥','济南','佛山','东莞','哈尔滨','沈阳','大连','南宁','贵阳','太原','石家庄','兰州','海口','三亚','香港','澳门','台北','南昌','常州','温州','金华','珠海','中山','台州','嘉兴','南通','徐州','泉州','洛阳','烟台','潍坊','临沂','保定','唐山','呼和浩特','乌鲁木齐','银川','西宁','拉萨','汕头','肇庆','江门','惠州','湛江','绵阳','赣州','芜湖','绍兴','盐城','扬州','泰州','镇江','桂林','丽江','大理','廊坊'];
+    const cm = t.match(/(?:城市|地点|演出城市)[：:\s]*([一-龥]{2,8})/);
+    if (cm) res.city = cm[1];
+    else { for (const c of CITIES) { if (t.indexOf(c) >= 0) { res.city = c; break; } } }
+    const vm = t.match(/([一-龥A-Za-z0-9·.\s]{2,24}?(?:体育馆|体育中心|体育场|文化中心|大会堂|剧院|音乐厅|演艺中心|展览中心|Livehouse|Studio|Arena|中心|馆))/i);
+    if (vm) res.venue = vm[1].trim().replace(/\s+/g, '');
+    else {
+      const vlm = t.match(/(?:场馆|场地|地点)[：:\s]*([一-龥A-Za-z0-9·.\s]{2,24})/);
+      if (vlm) res.venue = vlm[1].trim().replace(/\s+/g, '');
+    }
+    const seatRes = [
+      /内场[^，。\n]{0,10}/,
+      /看台[^，。\n]{0,10}/,
+      /包厢[^，。\n]{0,10}/,
+      /([A-Za-z0-9]\s*区)/,
+      /(\d+\s*排\s*\d*\s*座?)/,
+      /VIP[^，。\n]{0,6}/i
+    ];
+    const seen = new Set(); const seatParts = [];
+    for (const re of seatRes) {
+      const m = t.match(re);
+      if (m) { const s = (m[1] || m[0]).trim().replace(/\s+/g, ''); if (s && !seen.has(s)) { seen.add(s); seatParts.push(s); } }
+    }
+    res.seat = seatParts.slice(0, 2).join(' ');
+    const im = t.match(/(?:歌手|艺人|乐队|主演|表演|嘉宾|Artist)[：:\s]*([一-龥A-Za-z·&0-9\s]{2,16})/i);
+    if (im) res.idol = im[1].trim().replace(/\s+/g, '');
+    if (!res.idol) {
+      const EVT = ['演唱会','巡回','巡演','TOUR','CONCERT','LIVE','SHOW','见面会','音乐节','嘉年华','盛典'];
+      const idx = t.search(new RegExp(EVT.join('|'), 'i'));
+      if (idx > 0) {
+        const before = t.slice(0, idx);
+        const toks = before.split(/[\s,，。、·:：\-/]+/).map(s => s.trim()).filter(Boolean);
+        for (const tk of toks) {
+          if (/^[一-龥A-Za-z·&]{2,10}$/.test(tk) && !/^\d+$/.test(tk)) { res.idol = tk; break; }
+        }
+      }
+    }
+    if (!res.idol) {
+      const lines = t.split('\n').map(s => s.trim()).filter(Boolean);
+      for (const ln of lines) {
+        if (/^[一-龥A-Za-z·&]{2,8}$/.test(ln) && ln !== res.city && ln !== res.venue && !/\d/.test(ln)) { res.idol = ln; break; }
+      }
+    }
+    return res;
   }
 };
 
