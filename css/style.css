@@ -4061,12 +4061,12 @@ body { font-size: var(--fs-body); line-height: 1.65; }
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 12px;
   line-height: 1;
-  padding: 4px 6px;
+  padding: 2px 8px;
   cursor: pointer;
   border-radius: 8px;
-  opacity: 0.55;
+  opacity: 0.7;
   transition: all 0.15s ease;
   flex-shrink: 0;
 }
