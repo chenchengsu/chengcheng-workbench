@@ -3711,6 +3711,7 @@ const ConcertView = {
       if (res.city) parts.push(res.city);
       if (res.venue) parts.push(res.venue);
       if (res.seat) parts.push(res.seat);
+      if (res.note) parts.push(res.note);
       this._setOcrMsg('已识别并填入：' + (parts.join(' · ') || '（无）') + '\n请核对后点“保存”', 1);
       Toast.show('识别完成，请核对');
     } catch (err) {
@@ -3769,6 +3770,7 @@ const ConcertView = {
     if (res.city) { const el = document.getElementById('cCity'); if (el) el.value = res.city; }
     if (res.venue) { const el = document.getElementById('cVenue'); if (el) el.value = res.venue; }
     if (res.seat) { const el = document.getElementById('cSeat'); if (el) el.value = res.seat; }
+    if (res.note) { const el = document.getElementById('cNote'); if (el) el.value = res.note; }
   },
   _downscaleImage(file, maxDim) {
     return new Promise((resolve, reject) => {
@@ -3805,34 +3807,55 @@ const ConcertView = {
       }
     }
     const CITIES = ['北京','上海','广州','深圳','成都','杭州','重庆','武汉','南京','西安','苏州','天津','长沙','青岛','厦门','郑州','无锡','宁波','福州','昆明','合肥','济南','佛山','东莞','哈尔滨','沈阳','大连','南宁','贵阳','太原','石家庄','兰州','海口','三亚','香港','澳门','台北','南昌','常州','温州','金华','珠海','中山','台州','嘉兴','南通','徐州','泉州','洛阳','烟台','潍坊','临沂','保定','唐山','呼和浩特','乌鲁木齐','银川','西宁','拉萨','汕头','肇庆','江门','惠州','湛江','绵阳','赣州','芜湖','绍兴','盐城','扬州','泰州','镇江','桂林','丽江','大理','廊坊'];
-    const cm = t.match(/(?:城市|地点|演出城市)[：:\s]*([一-龥]{2,8})/);
-    if (cm) res.city = cm[1];
+    const cm = t.match(/(?:城市|地点|演出城市)[：:\s]*([一-龥]{2,8}(?:市)?)/);
+    if (cm) res.city = cm[1].replace(/市$/, '');
     else { for (const c of CITIES) { if (t.indexOf(c) >= 0) { res.city = c; break; } } }
-    const vm = t.match(/([一-龥A-Za-z0-9·.\s]{2,24}?(?:体育馆|体育中心|体育场|文化中心|大会堂|剧院|音乐厅|演艺中心|展览中心|Livehouse|Studio|Arena|中心|馆))/i);
-    if (vm) res.venue = vm[1].trim().replace(/\s+/g, '');
-    else {
-      const vlm = t.match(/(?:场馆|场地|地点)[：:\s]*([一-龥A-Za-z0-9·.\s]{2,24})/);
-      if (vlm) res.venue = vlm[1].trim().replace(/\s+/g, '');
+    const VENUE_TAGS = ['体育馆','体育中心','体育场','演艺中心','文化中心','大会堂','音乐厅','艺术中心','展览中心','奥体中心','青少年宫','大剧院','剧院','Livehouse','Studio','Arena'];
+    let venue = '';
+    for (const tag of VENUE_TAGS) {
+      const re = new RegExp('([一-龥A-Za-z·.\\s]{1,30}' + tag + ')', 'g');
+      let mm;
+      while ((mm = re.exec(t))) {
+        const cand = mm[1].replace(/\s+/g, '');
+        if (cand.length > venue.length) venue = cand;
+      }
     }
-    const seatRes = [
-      /内场[^，。\n]{0,10}/,
-      /看台[^，。\n]{0,10}/,
-      /包厢[^，。\n]{0,10}/,
-      /([A-Za-z0-9]\s*区)/,
-      /(\d+\s*排\s*\d*\s*座?)/,
-      /VIP[^，。\n]{0,6}/i
-    ];
-    const seen = new Set(); const seatParts = [];
-    for (const re of seatRes) {
-      const m = t.match(re);
-      if (m) { const s = (m[1] || m[0]).trim().replace(/\s+/g, ''); if (s && !seen.has(s)) { seen.add(s); seatParts.push(s); } }
+    if (!venue) {
+      const vlm = t.match(/(?:场馆|场地|地点)[：:\s]*([一-龥A-Za-z·.\\s]{2,24})/);
+      if (vlm) venue = vlm[1].replace(/\s+/g, '');
+      else {
+        const vm2 = t.match(/([一-龥A-Za-z·.\\s]{2,20}(?:中心|馆))/);
+        if (vm2) venue = vm2[1].replace(/\s+/g, '');
+      }
     }
-    res.seat = seatParts.slice(0, 2).join(' ');
-    const im = t.match(/(?:歌手|艺人|乐队|主演|表演|嘉宾|Artist)[：:\s]*([一-龥A-Za-z·&0-9\s]{2,16})/i);
-    if (im) res.idol = im[1].trim().replace(/\s+/g, '');
+    res.venue = venue;
+    for (const c of CITIES) { if (res.venue.indexOf(c) === 0) { res.venue = res.venue.slice(c.length); if (res.venue.startsWith('市')) res.venue = res.venue.slice(1); break; } }
+    const seatLine = t.split('\n').find(l => /看台|内场|包厢|VIP|\d+\s*排|\d+\s*座|[A-Za-z0-9]\s*区/.test(l));
+    if (seatLine) {
+      let s = seatLine.trim();
+      s = s.replace(/^[\s\S]*?(?=看台|内场|包厢|VIP|[A-Za-z0-9]\s*区|\d+\s*排)/, '');
+      s = s.replace(/[¥￥]?\s*\d{1,4}(?:\.\d{1,2})?\s*元\s*$/, '');
+      res.seat = s.replace(/\s+/g, '');
+    }
+    if (!res.seat) {
+      const fb = t.match(/(?:看台|内场|包厢)[^，。\n]{0,16}/);
+      if (fb) res.seat = fb[0].trim().replace(/\s+/g, '');
+    }
+    const EVT = ['演唱会','巡回','巡演','TOUR','CONCERT','LIVE','SHOW','见面会','音乐节','嘉年华','盛典'];
+    const evtRe = new RegExp(EVT.join('|'), 'i');
+    const evtLine = t.split('\n').find(l => evtRe.test(l));
+      if (evtLine) {
+        let name = evtLine.trim().replace(/\s+/g, '');
+        name = name.replace(/\d{4}[\D]\d{1,2}[\D]\d{1,2}[\s\S]*$/, '');
+        if (res.city) name = name.replace(new RegExp('[—\\-·~～]?\\s*' + res.city + '\\s*站\\s*$'), '');
+        if (name) res.idol = name;
+      }
     if (!res.idol) {
-      const EVT = ['演唱会','巡回','巡演','TOUR','CONCERT','LIVE','SHOW','见面会','音乐节','嘉年华','盛典'];
-      const idx = t.search(new RegExp(EVT.join('|'), 'i'));
+      const im = t.match(/(?:歌手|艺人|乐队|主演|表演|嘉宾|Artist)[：:\s]*([一-龥A-Za-z·&0-9\s]{2,16})/i);
+      if (im) res.idol = im[1].trim().replace(/\s+/g, '');
+    }
+    if (!res.idol) {
+      const idx = t.search(evtRe);
       if (idx > 0) {
         const before = t.slice(0, idx);
         const toks = before.split(/[\s,，。、·:：\-/]+/).map(s => s.trim()).filter(Boolean);
@@ -3847,6 +3870,8 @@ const ConcertView = {
         if (/^[一-龥A-Za-z·&]{2,8}$/.test(ln) && ln !== res.city && ln !== res.venue && !/\d/.test(ln)) { res.idol = ln; break; }
       }
     }
+    const pm = t.match(/([¥￥]?\s*\d{1,4}(?:\.\d{1,2})?\s*元)/);
+    if (pm) res.note = '票价' + pm[1].replace(/\s+/g, '');
     return res;
   }
 };
