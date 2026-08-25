@@ -346,6 +346,8 @@ const FormErr = {
     if (el.focus) el.focus();
   },
   clear(el) {
+    if (typeof el === 'string') el = $(el);
+    if (!el) return;
     el.classList.remove('error');
     const g = el.closest('.form-group') || el.parentElement;
     const tip = g && g.querySelector('.form-error');
