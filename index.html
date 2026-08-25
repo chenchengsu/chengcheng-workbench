@@ -25,7 +25,7 @@
   <!-- 舞台背景图最优先加载：打开即显示 -->
   <link rel="preload" as="image" href="stage-hero.png">
 
-  <link rel="stylesheet" href="css/style.css?v=131">
+  <link rel="stylesheet" href="css/style.css?v=132">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://beacon.cdn.qq.com/sdk/4.5.9/beacon_web.min.js"></script>
 <script>
@@ -68,6 +68,7 @@
       <section class="view" id="view-health"></section>
       <section class="view" id="view-notebook"></section>
       <section class="view" id="view-bead"></section>
+      <section class="view" id="view-concert"></section>
     </main>
 
     <!-- 底部导航 -->
@@ -92,6 +93,10 @@
         <svg class="nav-icon-img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
         <span>拼豆</span>
       </a>
+      <a class="nav-item" data-view="concert">
+        <svg class="nav-icon-img" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span>演唱会</span>
+      </a>
     </nav>
   </div>
 
@@ -107,9 +112,9 @@
   <!-- Toast（aria-live 供读屏自动朗读） -->
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
-  <script src="js/bead-data.js?v=131"></script>
-  <script src="js/bead-stock.js?v=131"></script>
-  <script src="js/app.js?v=131"></script>
+  <script src="js/bead-data.js?v=132"></script>
+  <script src="js/bead-stock.js?v=132"></script>
+  <script src="js/app.js?v=132"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').then(reg => {
