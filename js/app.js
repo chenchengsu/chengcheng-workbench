@@ -610,48 +610,20 @@ const HomeView = {
         <div class="live-clock-date" id="liveClockDate"></div>
       </div>
 
-      <div class="home-figure" aria-hidden="true">
-        <svg viewBox="0 0 120 150" width="138" height="172" fill="none">
-          <defs>
-            <linearGradient id="figBody" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#c4b5fd"/>
-              <stop offset="1" stop-color="#8b6fd6"/>
-            </linearGradient>
-            <linearGradient id="figHair" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#9b7be0"/>
-              <stop offset="1" stop-color="#6d4fc0"/>
-            </linearGradient>
-          </defs>
-          <path d="M14 150 C14 108 34 92 60 92 C86 92 106 108 106 150 Z" fill="url(#figBody)"/>
-          <rect x="51" y="74" width="18" height="24" rx="9" fill="#cbb8f5"/>
-          <path d="M28 60 C28 30 92 30 92 60 C92 78 84 86 84 86 L80 62 C80 46 40 46 40 62 L36 86 C36 86 28 78 28 60 Z" fill="url(#figHair)"/>
-          <ellipse cx="60" cy="56" rx="21" ry="24" fill="#f3edff"/>
-          <path d="M39 52 C39 32 81 32 81 52 C81 43 73 39 60 39 C47 39 39 43 39 52 Z" fill="url(#figHair)"/>
-          <circle cx="52" cy="56" r="2.1" fill="#42356b"/>
-          <circle cx="68" cy="56" r="2.1" fill="#42356b"/>
-          <circle cx="47" cy="63" r="3" fill="#f0a6c8" opacity="0.5"/>
-          <circle cx="73" cy="63" r="3" fill="#f0a6c8" opacity="0.5"/>
-          <path d="M52 67 Q60 73 68 67" stroke="#42356b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-
       <div class="home-quick glass">
         <div class="section-title"><span>快捷操作</span></div>
         <div class="home-quick-grid">
           <button class="home-quick-btn" onclick="AccountView.openAdd()" aria-label="记一笔">
             <span class="hq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
             <span class="hq-label">记一笔</span>
-            <span class="hq-key">1</span>
           </button>
           <button class="home-quick-btn" onclick="App.navigate('health'); HomeView._focusField('w-weight');" aria-label="称个重">
             <span class="hq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M6 7l-3 7h6z"/><path d="M18 7l-3 7h6z"/><path d="M12 7v3"/><path d="M8 21h8"/><path d="M12 10v8"/></svg></span>
             <span class="hq-label">称个重</span>
-            <span class="hq-key">2</span>
           </button>
           <button class="home-quick-btn" onclick="App.navigate('concert'); HomeView._focusField('cIdol');" aria-label="记一场">
             <span class="hq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
             <span class="hq-label">记一场</span>
-            <span class="hq-key">3</span>
           </button>
         </div>
       </div>
