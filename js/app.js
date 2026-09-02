@@ -610,6 +610,27 @@ const HomeView = {
         <div class="live-clock-date" id="liveClockDate"></div>
       </div>
 
+      <div class="home-quick glass">
+        <div class="section-title"><span>快捷操作</span></div>
+        <div class="home-quick-grid">
+          <button class="home-quick-btn" onclick="AccountView.openAdd()" aria-label="记一笔">
+            <span class="hq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+            <span class="hq-label">记一笔</span>
+            <span class="hq-key">1</span>
+          </button>
+          <button class="home-quick-btn" onclick="App.navigate('health'); HomeView._focusField('w-weight');" aria-label="称个重">
+            <span class="hq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M6 7l-3 7h6z"/><path d="M18 7l-3 7h6z"/><path d="M12 7v3"/><path d="M8 21h8"/><path d="M12 10v8"/></svg></span>
+            <span class="hq-label">称个重</span>
+            <span class="hq-key">2</span>
+          </button>
+          <button class="home-quick-btn" onclick="App.navigate('concert'); HomeView._focusField('cIdol');" aria-label="记一场">
+            <span class="hq-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>
+            <span class="hq-label">记一场</span>
+            <span class="hq-key">3</span>
+          </button>
+        </div>
+      </div>
+
       <div class="fab-export" onclick="CloudBackup.open()" title="导出 / 导入" role="button" tabindex="0" aria-label="数据备份与恢复" onkeydown="if(event.key==='Enter')CloudBackup.open()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
       </div>
@@ -618,6 +639,13 @@ const HomeView = {
 
     $('#view-home').innerHTML = html;
     this._startClock();
+  },
+
+  _focusField(id) {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) { el.focus(); if (el.select) { try { el.select(); } catch (e) {} } }
+    }, 60);
   },
 
   _startClock() {
@@ -3754,6 +3782,17 @@ const App = {
     if (!['home', 'account', 'health', 'notebook', 'bead', 'concert'].includes(lastView)) lastView = 'home';
     this.navigate(lastView);
     this._fillLaunchPreview();
+    // 首页快捷键：1=记一笔 2=称个重 3=记一场（输入框/弹窗聚焦时不触发）
+    document.addEventListener('keydown', e => {
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const modalOpen = $('#modalOverlay') && $('#modalOverlay').classList.contains('active');
+      if (modalOpen) return;
+      if (e.key === '1') { e.preventDefault(); AccountView.openAdd(); }
+      else if (e.key === '2') { e.preventDefault(); App.navigate('health'); HomeView._focusField('w-weight'); }
+      else if (e.key === '3') { e.preventDefault(); App.navigate('concert'); HomeView._focusField('cIdol'); }
+    });
   },
   _fillLaunchPreview() {
     const el = document.getElementById('appLaunch');
