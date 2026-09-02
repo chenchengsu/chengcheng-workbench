@@ -4165,7 +4165,7 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 /* 首页快捷操作卡 */
 .home-quick {
   position: relative; z-index: 1;
-  margin-top: auto; margin-bottom: 14vh; padding: 16px; border-radius: 20px;
+  margin-top: auto; margin-bottom: calc(86px + env(safe-area-inset-bottom, 0px)); padding: 16px; border-radius: 20px;
   background: rgba(10, 10, 20, 0.52);
   border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
