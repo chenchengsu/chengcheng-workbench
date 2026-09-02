@@ -4161,13 +4161,9 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 }
 .dp-done { width: 100%; margin-top: 14px; }
 
-/* 首页人物半身像 */
-.home-figure { display: flex; justify-content: center; margin: 10px 0 0; }
-.home-figure svg { width: 132px; height: auto; filter: drop-shadow(0 10px 22px rgba(167, 139, 250, 0.28)); }
-
 /* 首页快捷操作卡 */
 .home-quick {
-  margin-top: 2px; padding: 16px; border-radius: 20px;
+  margin-top: 8px; padding: 16px; border-radius: 20px;
   background: rgba(10, 10, 20, 0.52);
   border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -4202,12 +4198,5 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 }
 .home-quick-btn .hq-label {
   font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
-}
-.home-quick-btn .hq-key {
-  position: absolute; top: 6px; right: 8px;
-  font-size: 10px; font-weight: 700; line-height: 1;
-  padding: 3px 5px; border-radius: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.55);
 }
 
