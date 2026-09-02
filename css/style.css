@@ -3194,18 +3194,6 @@ input[type="date"]::-webkit-datetime-edit-fields-wrapper {
   display: flex; flex-direction: column;
 }
 
-/* 首页人物背景层 */
-.home-figure-bg {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  display: flex; justify-content: center; align-items: flex-end;
-  z-index: 0; pointer-events: none;
-}
-.home-figure-bg svg {
-  width: min(82vw, 340px); height: auto;
-  opacity: 0.5;
-  filter: drop-shadow(0 12px 30px rgba(167, 139, 250, 0.32));
-}
-
 /* 实时数字时钟组件（精确到秒） */
 .live-clock {
   position: relative; z-index: 1;
