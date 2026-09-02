@@ -4161,3 +4161,49 @@ body { font-size: var(--fs-body); line-height: 1.65; }
 }
 .dp-done { width: 100%; margin-top: 14px; }
 
+/* 首页快捷操作卡 */
+.home-quick {
+  margin-top: 8px; padding: 16px; border-radius: 20px;
+  background: rgba(10, 10, 20, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  position: relative; overflow: hidden;
+}
+.home-quick .section-title { margin-bottom: 12px; }
+.home-quick-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.home-quick-btn {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 16px 4px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.88);
+  cursor: pointer; transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  font: inherit;
+}
+.home-quick-btn:active { transform: scale(0.95); background: rgba(167, 139, 250, 0.16); }
+.home-quick-btn .hq-ico {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(167, 139, 250, 0.16);
+  color: #ffffff;
+}
+.home-quick-btn .hq-ico svg {
+  width: 22px; height: 22px;
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.45));
+}
+.home-quick-btn .hq-label {
+  font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+}
+.home-quick-btn .hq-key {
+  position: absolute; top: 6px; right: 8px;
+  font-size: 10px; font-weight: 700; line-height: 1;
+  padding: 3px 5px; border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.55);
+}
+
